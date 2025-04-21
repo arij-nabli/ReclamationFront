@@ -7,12 +7,14 @@ import { DecideurDetailsComponent } from './components/decideur-details/decideur
 import { ValidateursClotureComponent } from './components/validateurs-cloture/validateurs-cloture.component';
 import { ValidateurDetailsComponent } from './components/validateur-details/validateur-details.component';
 import { SeverityListComponent } from './severity/severity-list/severity-list.component';
+import { ProductListComponent } from './product-list/product-list.component';
 
 
 const routes: Routes = [
   { path: 'validateurs-cloture/:id', component: ValidateursClotureComponent },
      { path: 'AdminDashbord', component: DashboardComponent },
         { path: 'claimetype', component: ClaimetypeComponent },
+        { path: 'product', component: ProductListComponent},
         { path: 'sevirity', component: SeverityListComponent},
         { path: 'decideurs/:id', component: DecideurDetailsComponent },
         { path: 'validateurs/:id', component: ValidateurDetailsComponent},

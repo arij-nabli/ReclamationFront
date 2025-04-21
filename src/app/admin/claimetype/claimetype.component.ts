@@ -27,7 +27,7 @@ export class ClaimetypeComponent implements OnInit {
    length = 0; // claimTypes.length
    totalPages = 0;
  
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
 
   constructor(private claimetypeService: ClaimtypesService) {}
   
@@ -47,9 +47,7 @@ export class ClaimetypeComponent implements OnInit {
 
     this.loadClaimTypes();
   }
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-  }
+
   loadClaimTypes() {
     this.claimetypeService.getClaimTypes().subscribe(
       (response: any) => {

@@ -1,4 +1,8 @@
 import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { AuthService } from '../authservice/auth.service';
 
 @Component({
   selector: 'app-sign-in',
@@ -6,5 +10,82 @@ import { Component } from '@angular/core';
   styleUrls: ['./sign-in.component.css']
 })
 export class SignInComponent {
-  hide=false;
+  hide = true; // Pour masquer/afficher le mot de passe
+  loginForm: FormGroup;
+  isLoading = false; // État de chargement
+  errorMessage: string | null = null;
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router,
+    private snackBar: MatSnackBar
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+      rememberMe: [false] // Ajout du champ rememberMe
+    });
+  }
+
+  // Soumission du formulaire
+  onSubmit(): void {
+    if (this.loginForm.invalid) {
+      return;
+    }
+    this.errorMessage = null;
+    this.isLoading = true;
+    const credentials = {
+      email: this.loginForm.value.email,
+      password: this.loginForm.value.password
+    };
+
+    this.authService.signIn(credentials).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        if (this.loginForm.value.rememberMe) {
+          localStorage.setItem('rememberedEmail', this.loginForm.value.email);
+        }
+        this.router.navigate(['admin/AdminDashbord']);
+      },
+      error: (error) => {
+        this.isLoading = false;
+  console.log(error.error)
+       
+          const errorMessage = error.error;
+
+          if (errorMessage.includes('incorrect password') || errorMessage.includes('Invalid credentials')) {
+            this.errorMessage = 'Mot de passe incorrect.';
+          } else if (errorMessage.includes('not found') || errorMessage.includes('email')) {
+            this.errorMessage = 'Adresse email introuvable.';
+          } else {
+            this.errorMessage = 'Échec de la connexion. Veuillez vérifier vos identifiants.';
+          }
+        } 
+       
+      }
+    );
+  }
+
+  // Affichage des messages d'erreur
+  private showErrorMessage(message: string): void {
+    this.snackBar.open(message, 'Fermer', {
+      duration: 5000,
+      panelClass: ['error-snackbar']
+    });
+  }
+
+  // Gestion des erreurs de formulaire
+  get email() { return this.loginForm.get('email'); }
+  get password() { return this.loginForm.get('password'); }
+  get rememberMe() { return this.loginForm.get('rememberMe'); }
+
+  ngOnInit(): void {
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    if (rememberedEmail) {
+      this.loginForm.patchValue({
+        email: rememberedEmail,
+        rememberMe: true
+      });
+    }
+  }
 }

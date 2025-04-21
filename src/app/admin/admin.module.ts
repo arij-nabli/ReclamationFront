@@ -27,6 +27,7 @@ import { DecideurDetailsComponent } from './components/decideur-details/decideur
 import { ValidateurDetailsComponent } from './components/validateur-details/validateur-details.component';
 import { ValidateursClotureComponent } from './components/validateurs-cloture/validateurs-cloture.component';
 import { SeverityListComponent } from './severity/severity-list/severity-list.component';
+import { ProductListComponent } from './product-list/product-list.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { SeverityListComponent } from './severity/severity-list/severity-list.co
     DecideurDetailsComponent,
     ValidateurDetailsComponent,
     ValidateursClotureComponent,
-    SeverityListComponent
+    SeverityListComponent,
+    ProductListComponent
   ],
   imports: [
     CommonModule,

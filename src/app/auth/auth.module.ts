@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
-
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ForgetPasswordComponent } from './forget-password/forget-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
@@ -22,7 +22,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     
   ],
   imports: [
-    CommonModule,  ReactiveFormsModule,AuthRoutingModule,MatButtonModule,
+    CommonModule,  ReactiveFormsModule,AuthRoutingModule,MatButtonModule,MatSnackBarModule,
     MatFormFieldModule,MatInputModule,MatProgressSpinnerModule,MatIconModule ,MatCheckboxModule
 
     

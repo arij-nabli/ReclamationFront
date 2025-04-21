@@ -18,9 +18,10 @@ export class SeverityListComponent implements OnInit {
   actionMenuOpen: string | null = null;
   addSeverityForm!: FormGroup;
   // Pagination
+  pageSize = 5;
   currentPage = 0;
-  pageSize = 10;
-  totalPages = 1;
+  length = 0; 
+  totalPages = 0;
   
   newSeverity: Severity = {
     label: '',
@@ -52,10 +53,13 @@ export class SeverityListComponent implements OnInit {
   loadSeverities(): void {
     this.severityService.getAllSeverities().subscribe(
       (response: any) => {
-        console.log('API Response:', response);
+      
         this.severities = response.$values || []; 
         this.filteredSeverities = [...this.severities];
-        this.updatePagination();
+    
+        this.length = this.severities.length;
+        this.calculateTotalPages();
+        
       },
       error => {
         console.error('Erreur lors du chargement des niveaux de gravité', error);
@@ -64,41 +68,48 @@ export class SeverityListComponent implements OnInit {
   }
 
   // Pagination methods
-  updatePagination(): void {
-    this.totalPages = Math.ceil(this.filteredSeverities.length / this.pageSize);
-    this.currentPage = Math.min(this.currentPage, this.totalPages - 1);
-  }
 
   get paginatedSeverities(): Severity[] {
     const start = this.currentPage * this.pageSize;
     return this.filteredSeverities.slice(start, start + this.pageSize);
   }
 
-  onPageSizeChange(): void {
-    this.currentPage = 0;
-    this.updatePagination();
+  onPageChange(event: any) {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.calculateTotalPages();
   }
+  
 
-  goToFirstPage(): void {
-    this.currentPage = 0;
+  calculateTotalPages() {
+    this.totalPages = Math.ceil(this.length / this.pageSize);
   }
-
-  goToLastPage(): void {
-    this.currentPage = this.totalPages - 1;
-  }
-
-  previousPage(): void {
+  
+  previousPage() {
     if (this.currentPage > 0) {
       this.currentPage--;
     }
   }
-
-  nextPage(): void {
+  
+  nextPage() {
     if (this.currentPage < this.totalPages - 1) {
       this.currentPage++;
     }
   }
-
+  
+  goToFirstPage() {
+    this.currentPage = 0;
+  }
+  
+  goToLastPage() {
+    this.currentPage = this.totalPages - 1;
+  }
+  
+  onPageSizeChange() {
+    this.currentPage = 0;
+    this.calculateTotalPages();
+  }
+ 
   // CRUD operations
     addSeverity(): void {
       if (this.addSeverityForm.valid) {
@@ -106,12 +117,14 @@ export class SeverityListComponent implements OnInit {
     
         this.severityService.addSeverity(newSeverity).subscribe({
           next: () => {
-            this.loadSeverities();
+       
             this.showAddForm = false;
+          
             this.addSeverityForm.reset({
               label: '',
               gravityCoefficient: 1
             });
+            this.loadSeverities();
           },
           error: (err) => {
             console.error('Erreur lors de l\'ajout:', err);

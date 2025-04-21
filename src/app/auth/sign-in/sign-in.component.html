@@ -1,56 +1,68 @@
-<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-  <div class="sm:mx-auto sm:w-full sm:max-w-md">
-    <img src="assets/Logo.png" alt="SHREYU Logo" class="h-12 mx-auto mb-6" />
-    <h2 class="mt-6 text-center text-2xl font-extrabold mb-6 text-gray-900">
-      Sign in to your account
-    </h2>
-    <p class="text-center text-sm text-gray-600">
-      Welcome back! Please enter your credentials to continue.
-    </p>
+<div class="min-h-screen bg-gray-200 flex flex-col">
+  <!-- Logo et titre -->
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md flex flex-col items-center">
+    <img src="assets/Logo.png" alt="SHREYU Logo" class="h-13 mx-auto" />
+    <div class="sm:mx-auto sm:w-full sm:max-w-md flex flex-col items-center">
+      <h2 class="text-center text-2xl font-extrabold mb-3 text-gray-900">
+        Connectez-vous à votre compte
+      </h2>
+      <p class="text-center text-sm text-gray-600">
+        Bienvenue ! Veuillez saisir vos identifiants pour continuer.
+      </p>
+    </div>
   </div>
 
+  <!-- Formulaire de connexion -->
   <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div *ngIf="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 text-center">
+      {{ errorMessage }}
+    </div>
     <div class="bg-white py-8 px-4 shadow-md sm:rounded-lg sm:px-10">
-      <form class="space-y-6" action="#" method="POST">
-        <!-- Email -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Champ Email -->
         <div>
           <mat-label class="block text-sm font-medium text-gray-900">Email</mat-label>
           <mat-form-field appearance="outline" class="w-full">
-            <input matInput type="email" placeholder="you@example.com" class="text-gray-900 mt-2" />
+            <input matInput formControlName="email" type="email" class="text-gray-900 mt-2" />
             <mat-icon matSuffix style="color: #2A62FE;">mail_outline</mat-icon>
+            <mat-error *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="text-red-500 text-sm mt-1">
+              <span *ngIf="email?.errors?.['required']">L'email est requis</span>
+              <span *ngIf="email?.errors?.['email']">Veuillez entrer un email valide</span>
+            </mat-error>
           </mat-form-field>
         </div>
 
-        <!-- Password -->
+        <!-- Champ Mot de passe -->
         <div>
-          <mat-label class="block text-sm font-medium text-gray-900">Password</mat-label>
-          <mat-form-field appearance="outline" class="w-full ">
-            <input matInput [type]="hide ? 'password' : 'text'" placeholder="••••••••" class="text-gray-900 mt-2" />
-            <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Toggle password visibility'" style="color: #2A62FE;">
+          <mat-label class="block text-sm font-medium text-gray-900">Mot de passe</mat-label>
+          <mat-form-field appearance="outline" class="w-full">
+            <input matInput formControlName="password" [type]="hide ? 'password' : 'text'" class="text-gray-900 mt-2" />
+            <button mat-icon-button matSuffix (click)="hide = !hide" type="button" [attr.aria-label]="'Afficher/masquer le mot de passe'" style="color: #2A62FE;">
               <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
+            <mat-error *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="text-red-500 text-sm mt-1">
+              Le mot de passe est requis
+            </mat-error>
           </mat-form-field>
         </div>
 
-        <!-- Remember Me + Forgot Password -->
+        <!-- Options -->
         <div class="flex items-center justify-between text-sm">
-          <label class="flex items-center space-x-2">
-           
-            <span class="text-gray-700">Remember me</span>
-          </label>
-          <a href="/forget-password" class="text-blue-600 hover:underline" style="color: #2A62FE;">Forgot your password?</a>
+          
+          <a routerLink="/forget-password" class="text-blue-600 hover:underline" style="color: #2A62FE;">Mot de passe oublié ?</a>
         </div>
 
-        <!-- Submit Button -->
+        <!-- Bouton de connexion -->
         <div>
           <button type="submit" mat-raised-button
             style="background-color: #2A62FE; color: white;"
-            class="w-full py-2 px-4 text-sm font-medium rounded-md shadow hover:shadow-md transition">
-            Sign In
+            class="w-full py-2 px-4 text-sm font-medium rounded-md shadow hover:shadow-md transition"
+            [disabled]="loginForm.invalid || isLoading">
+            <span *ngIf="!isLoading">Se connecter</span>
+            <span *ngIf="isLoading">Connexion en cours...</span>
           </button>
         </div>
       </form>
-
     </div>
   </div>
 </div>
