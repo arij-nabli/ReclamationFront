@@ -43,6 +43,13 @@
           </div>
           <span class="hidden sm:inline text-sm font-medium text-white">Admin</span>
         </button>
+      
+        <!-- Menu déroulant de l'utilisateur -->
+        <div *ngIf="userMenuOpen" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+          <a (click)="logout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+            Déconnexion
+          </a>
+        </div>
       </div>
     </div>
   </div>

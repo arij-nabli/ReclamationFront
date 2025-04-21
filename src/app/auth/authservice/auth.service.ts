@@ -12,7 +12,19 @@ export class AuthService {
 )
 {
 }
-
+getCurrentUser() {
+    console.log(localStorage.getItem('UserName'));
+    return JSON.parse(localStorage.getItem('name') || '{}');
+   
+  }
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('token'); // ou sessionStorage, ou autre méthode
+  }
+  
+logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('rememberedEmail'); // Optionnel
+  }
   set accessToken(token: string)
   {
       localStorage.setItem('accessToken', token);

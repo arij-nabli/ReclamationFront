@@ -42,11 +42,18 @@ export class SignInComponent {
     this.authService.signIn(credentials).subscribe({
       next: (response) => {
         this.isLoading = false;
+      
+        // Sauvegarder le token
+        localStorage.setItem('token', response.token);
+     
+        // Sauvegarder l'email si rememberMe est coché
         if (this.loginForm.value.rememberMe) {
           localStorage.setItem('rememberedEmail', this.loginForm.value.email);
         }
+      
         this.router.navigate(['admin/AdminDashbord']);
       },
+      
       error: (error) => {
         this.isLoading = false;
   console.log(error.error)
@@ -65,7 +72,16 @@ export class SignInComponent {
       }
     );
   }
-
+  private decodeToken(token: string): any {
+    try {
+      const payload = token.split('.')[1]; // La 2e partie du token contient les infos
+      const decodedPayload = atob(payload); // Décodage base64
+      return JSON.parse(decodedPayload); // Conversion en objet
+    } catch (error) {
+      console.error('Erreur lors du décodage du token', error);
+      return null;
+    }
+  }
   // Affichage des messages d'erreur
   private showErrorMessage(message: string): void {
     this.snackBar.open(message, 'Fermer', {
