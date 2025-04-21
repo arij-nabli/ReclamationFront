@@ -1,0 +1,53 @@
+/* Correction du style du paginator */
+.custom-paginator .mat-select-value {
+    color: #2A62FE; /* Couleur du texte */
+    font-weight: 500;
+  }
+  
+  .custom-paginator .mat-select-arrow {
+    color: #2A62FE; /* Couleur de la flèche */
+  }
+  
+  .custom-paginator .mat-select-panel {
+    background: white;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .custom-paginator .mat-option {
+    padding: 0 16px;
+    height: 36px;
+    line-height: 36px;
+  }
+  
+  .custom-paginator .mat-option:hover {
+    background: #EBF3FE;
+  }
+  
+  .custom-paginator .mat-paginator-page-size-label {
+    margin-right: 8px;
+    color: #6B7280;
+  }
+  
+  .custom-paginator .mat-paginator-range-actions button {
+    color: #2A62FE;
+  }
+  
+  /* Pour les petits écrans */
+  @media (max-width: 640px) {
+    .custom-paginator {
+      font-size: 0.875rem;
+    }
+    
+    .custom-paginator .mat-paginator-page-size-label {
+      display: none;
+    }
+    
+    .custom-paginator .mat-paginator-page-size {
+      margin-right: 8px;
+    }
+    
+    .custom-paginator .mat-paginator-range-label {
+      margin: 0 4px;
+    }
+  }

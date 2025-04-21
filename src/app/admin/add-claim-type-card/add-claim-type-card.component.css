@@ -1,0 +1,30 @@
+.step {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.step.active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.fa-check-circle:before {
+  content: "✓";
+  font-family: Arial, sans-serif;
+}
+
+.fa-times-circle:before {
+  content: "✗";
+  font-family: Arial, sans-serif;
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+}

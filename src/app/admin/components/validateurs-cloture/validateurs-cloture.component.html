@@ -1,0 +1,173 @@
+<div class="flex flex-col h-screen "style="background-color: #EBF3FE;">
+  <app-navbar></app-navbar>
+  
+  <div class="flex flex-1 overflow-hidden">
+    <app-sidebar></app-sidebar>
+    
+    <main class="flex-1 overflow-auto p-4">
+      <div class="p-4 lg:ml-64">
+        <!-- En-tête -->
+        <div class="mb-8">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <div>
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-800">
+                    Liste des Validateurs de Clôture
+                </h2>
+                <h1 class="text-lg sm:text-xl font-semibold text-gray-600 mb-2">pour la réclamation de nom {{title}}</h1>
+            </div>
+            <div class="flex gap-2">
+                <button
+                    (click)="afficherListeAgents('ajouter')"
+                    class="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    Ajouter
+                </button>
+                <button
+                    (click)="afficherListeAgents('retirer')"
+                    class="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    Retirer
+                </button>
+            </div>
+        </div>
+
+          <!-- Tableau des Validateurs -->
+          <div *ngIf="validateursCloture && validateursCloture.length > 0; else noData" class="overflow-x-auto rounded-lg border border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prénom</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Email</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Nom d'utilisateur</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let validateur of validateursCloture" class="hover:bg-gray-50">
+             
+                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ validateur.firstName }}</td>
+                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ validateur.lastName }}</td>
+                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">{{ validateur.email }}</td>
+                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">{{ validateur.userName }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Si aucun validateur n'est trouvé -->
+          <ng-template #noData>
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prénom</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Email</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Nom d'utilisateur</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="5" class="px-4 py-4 text-center text-sm text-gray-500">
+                      Aucun validateur de clôture trouvé pour ce type de réclamation
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Liste des agents avec checkboxes (apparaît seulement quand afficherAgents = true) -->
+        <div *ngIf="afficherAgents" class="mt-8">
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4 mb-4">
+            <h3 class="text-base sm:text-lg font-semibold">Sélectionnez des agents</h3>
+            <div class="flex gap-2">
+              <button 
+                (click)="cacherListeAgents()"
+                class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors"
+              >
+                Annuler
+              </button>
+              <button 
+              (click)="ajouterAgentsCommeValidateurs()"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+              {{ modeRetrait ? 'Retirer les sélectionnés' : 'Valider (' + agentsSelectionnes.length + ')' }}
+          </button>
+            </div>
+          </div>
+
+          <!-- Barre de recherche -->
+          <div class="mb-4">
+            <input
+              type="text"
+              placeholder="Rechercher un agent..."
+              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              (input)="filterAgents($event)"
+            >
+          </div>
+
+          <div class="overflow-x-auto rounded-lg border border-gray-200">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sélection</th>
+       
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prénom</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Email</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let agent of filteredAgents" class="hover:bg-gray-50">
+                  <td class="px-4 py-4 whitespace-nowrap">
+                    <input
+                        type="checkbox"
+                        [checked]="isSelected(agent)"
+                        [disabled]="modeRetrait ? !isAlreadyValidateurCloture(agent) : isAlreadyValidateurCloture(agent)"
+                        (change)="toggleSelection(agent)"
+                        class="h-4 w-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
+                    >
+                    <span *ngIf="isAlreadyValidateurCloture(agent) && !modeRetrait" class="ml-2 text-xs text-gray-500">(Déjà validateur)</span>
+                </td>
+                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ agent.firstName }}</td>
+                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ agent.lastName }}</td>
+                  <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">{{ agent.email }}</td>
+                </tr>
+                <tr *ngIf="filteredAgents.length === 0">
+                  <td colspan="5" class="px-4 py-4 text-center text-sm text-gray-500">
+                    Aucun agent trouvé
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+        </div>
+      </div>
+      <div class="p-4 lg:ml-64">
+        <!-- Bouton de retour -->
+        <button 
+          (click)="retour()"
+          class="flex items-center gap-2 mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          Retour
+        </button>
+      
+        <!-- Le reste de votre code existant... -->
+      </div>
+    </main>
+  </div>
+</div>
