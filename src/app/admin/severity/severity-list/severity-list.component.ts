@@ -2,6 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Severity } from 'src/app/Models/Severity';
 import { SeverityService } from '../../adminservice/severityservice/severity.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-severity-list',
@@ -15,7 +16,7 @@ export class SeverityListComponent implements OnInit {
   showEditForm = false;
   showDeleteModal = false;
   actionMenuOpen: string | null = null;
-  
+  addSeverityForm!: FormGroup;
   // Pagination
   currentPage = 0;
   pageSize = 10;
@@ -33,22 +34,31 @@ export class SeverityListComponent implements OnInit {
   };
   
   severityToDelete: Severity | null = null;
-
-  constructor(private severityService: SeverityService) {}
+  editSeverityForm!: FormGroup;
+  constructor(private severityService: SeverityService, private fb: FormBuilder,) {}
 
   ngOnInit(): void {
     this.loadSeverities();
+    this.addSeverityForm = this.fb.group({
+      label: ['', Validators.required],
+      gravityCoefficient: [1, [Validators.required, Validators.min(1)]]
+    });
+    this.editSeverityForm = this.fb.group({
+      label: ['', Validators.required],
+      gravityCoefficient: [1, [Validators.required, Validators.min(1)]]
+    }); 
   }
+
   loadSeverities(): void {
     this.severityService.getAllSeverities().subscribe(
       (response: any) => {
         console.log('API Response:', response);
-       this.severities = response.$values || []; 
-       this.filteredSeverities = [...this.severities];
-       this.updatePagination();
+        this.severities = response.$values || []; 
+        this.filteredSeverities = [...this.severities];
+        this.updatePagination();
       },
       error => {
-        console.error('Erreur lors du chargement des claim types', error);
+        console.error('Erreur lors du chargement des niveaux de gravité', error);
       }
     );
   }
@@ -90,38 +100,61 @@ export class SeverityListComponent implements OnInit {
   }
 
   // CRUD operations
-  addSeverity(): void {
-    this.severityService.addSeverity(this.newSeverity).subscribe({
-      next: () => {
-        this.loadSeverities();
-        this.showAddForm = false;
-        this.resetNewSeverity();
-      },
-      error: (err) => {
-        console.error('Erreur lors de l\'ajout:', err);
+    addSeverity(): void {
+      if (this.addSeverityForm.valid) {
+        const newSeverity: Severity = this.addSeverityForm.value;
+    
+        this.severityService.addSeverity(newSeverity).subscribe({
+          next: () => {
+            this.loadSeverities();
+            this.showAddForm = false;
+            this.addSeverityForm.reset({
+              label: '',
+              gravityCoefficient: 1
+            });
+          },
+          error: (err) => {
+            console.error('Erreur lors de l\'ajout:', err);
+          }
+        });
       }
-    });
-  }
-
-  editSeverity(severity: Severity): void {
-    this.editSeverityData = { ...severity };
-    this.showEditForm = true;
-    this.actionMenuOpen = null;
-  }
-
-  updateSeverity(): void {
-    if (this.editSeverityData.id) {
-      this.severityService.updateSeverity(this.editSeverityData.id, this.editSeverityData).subscribe({
-        next: () => {
-          this.loadSeverities();
-          this.showEditForm = false;
-        },
-        error: (err) => {
-          console.error('Erreur lors de la mise à jour:', err);
-        }
-      });
     }
-  }
+    preventInvalidInput(event: KeyboardEvent) {
+      // Bloquer e, E, +, - qui sont autorisés par défaut dans les input type="number"
+      if (['e', 'E', '+', '-'].includes(event.key)) {
+        event.preventDefault();
+      }
+    }
+    
+    editSeverity(severity: Severity): void {
+      this.editSeverityData = { ...severity };
+      this.editSeverityForm.patchValue({
+        label: severity.label,
+        gravityCoefficient: severity.gravityCoefficient
+      });
+      this.showEditForm = true;
+      this.actionMenuOpen = null;
+    }
+    
+
+    updateSeverity(): void {
+      if (this.editSeverityData.id && this.editSeverityForm.valid) {
+        const updatedSeverity: Severity = {
+          id: this.editSeverityData.id,
+          ...this.editSeverityForm.value
+        };
+        this.severityService.updateSeverity(updatedSeverity.id, updatedSeverity).subscribe({
+          next: () => {
+            this.loadSeverities();
+            this.showEditForm = false;
+          },
+          error: (err) => {
+            console.error('Erreur lors de la mise à jour:', err);
+          }
+        });
+      }
+    }
+    
 
   confirmDelete(severity: Severity): void {
     this.severityToDelete = severity;
@@ -145,10 +178,10 @@ export class SeverityListComponent implements OnInit {
   }
 
   // UI helpers
-// severity-list.component.ts
-toggleActionMenu(id: string | undefined): void {
-  this.actionMenuOpen = id ? (this.actionMenuOpen === id ? null : id) : null;
-}
+  toggleActionMenu(id: string | undefined): void {
+    this.actionMenuOpen = id ? (this.actionMenuOpen === id ? null : id) : null;
+  }
+
   cancelAdd(): void {
     this.showAddForm = false;
     this.resetNewSeverity();

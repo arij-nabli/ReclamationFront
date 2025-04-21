@@ -29,7 +29,7 @@ export class SeverityService {
   }
 
   // Mettre à jour un niveau de gravité
-  updateSeverity(id: string, severity: Severity): Observable<Severity> {
+  updateSeverity(id: any, severity: Severity): Observable<Severity> {
     return this.http.put<Severity>(`${this.apiUrl}/${id}`, severity);
   }
 
