@@ -6,6 +6,8 @@ import { AppComponent } from './app.component';
 import { AuthModule } from './auth/auth.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AdminModule } from './admin/admin.module';
+import { ClaimModule } from './claim/claim.module';
+
 
 
 @NgModule({
@@ -19,7 +21,7 @@ import { AdminModule } from './admin/admin.module';
     AuthModule,
     BrowserAnimationsModule,
     AdminModule ,
- 
+   ClaimModule
   ],
   providers: [],
   bootstrap: [AppComponent]

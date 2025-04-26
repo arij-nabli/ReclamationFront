@@ -32,46 +32,60 @@ export class SignInComponent {
     if (this.loginForm.invalid) {
       return;
     }
+  
     this.errorMessage = null;
     this.isLoading = true;
     const credentials = {
       email: this.loginForm.value.email,
       password: this.loginForm.value.password
     };
-
+  
     this.authService.signIn(credentials).subscribe({
       next: (response) => {
         this.isLoading = false;
-      
+  
         // Sauvegarder le token
         localStorage.setItem('token', response.token);
-     
+  
         // Sauvegarder l'email si rememberMe est coché
         if (this.loginForm.value.rememberMe) {
           localStorage.setItem('rememberedEmail', this.loginForm.value.email);
         }
-      
-        this.router.navigate(['admin/AdminDashbord']);
+  
+        // Décoder le token pour obtenir le rôle
+        const decodedToken = this.decodeToken(response.token);
+  
+        if (decodedToken && decodedToken.role) {
+          const role = decodedToken.role;
+  
+          if (role === 'Admin') {
+            this.router.navigate(['admin/AdminDashbord']);
+          } else if (role === 'Client') {
+            this.router.navigate(['claim/add']);
+          } else {
+            this.errorMessage = 'Rôle utilisateur inconnu.';
+          }
+        } else {
+          this.errorMessage = 'Impossible de déterminer le rôle.';
+        }
       },
-      
       error: (error) => {
         this.isLoading = false;
-  console.log(error.error)
-       
-          const errorMessage = error.error;
-
-          if (errorMessage.includes('incorrect password') || errorMessage.includes('Invalid credentials')) {
-            this.errorMessage = 'Mot de passe incorrect.';
-          } else if (errorMessage.includes('not found') || errorMessage.includes('email')) {
-            this.errorMessage = 'Adresse email introuvable.';
-          } else {
-            this.errorMessage = 'Échec de la connexion. Veuillez vérifier vos identifiants.';
-          }
-        } 
-       
+        console.log(error.error);
+  
+        const errorMessage = error.error;
+  
+        if (errorMessage.includes('incorrect password') || errorMessage.includes('Invalid credentials')) {
+          this.errorMessage = 'Mot de passe incorrect.';
+        } else if (errorMessage.includes('not found') || errorMessage.includes('email')) {
+          this.errorMessage = 'Adresse email introuvable.';
+        } else {
+          this.errorMessage = 'Échec de la connexion. Veuillez vérifier vos identifiants.';
+        }
       }
-    );
+    });
   }
+  
   private decodeToken(token: string): any {
     try {
       const payload = token.split('.')[1]; // La 2e partie du token contient les infos

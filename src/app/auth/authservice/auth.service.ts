@@ -1,76 +1,98 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { catchError, Observable, of, switchMap, throwError } from 'rxjs';
+import { catchError, Observable, of, switchMap, throwError, BehaviorSubject } from 'rxjs';
+import { Router } from '@angular/router';
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private _authenticated = new BehaviorSubject<boolean>(false);
+
   constructor(
     private _httpClient: HttpClient,
- 
-)
-{
-}
-getCurrentUser() {
-    console.log(localStorage.getItem('UserName'));
-    return JSON.parse(localStorage.getItem('name') || '{}');
-   
-  }
-  isAuthenticated(): boolean {
-    return !!localStorage.getItem('token'); // ou sessionStorage, ou autre méthode
-  }
-  
-logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('rememberedEmail'); // Optionnel
-  }
-  set accessToken(token: string)
-  {
-      localStorage.setItem('accessToken', token);
+    private _router: Router
+  ) {
+    // Initialiser l'état d'authentification
+    this._authenticated.next(this.isAuthenticated());
   }
 
-  get accessToken(): string
-  {
-      return localStorage.getItem('accessToken') ?? '';
+  getCurrentUser() {
+    const userData = localStorage.getItem('userData');
+    return userData ? JSON.parse(userData) : null;
   }
-  private _authenticated: boolean = false;
-   /**
-     * Sign in
-     *
-     * @param credentials
-     */
-   signIn(credentials: { email: string; password: string }): Observable<any> {
-    // Vérifier si l'utilisateur est déjà connecté
-    if (this._authenticated) {
-        return throwError('User is already logged in.');
+
+  getUserId(): string {
+    const token = this.accessToken;
+    if (!token) throw new Error('No token found');
+  
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.id || 
+             payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] || 
+             payload.sub;
+    } catch (error) {
+      console.error('Token decoding error:', error);
+      throw new Error('Invalid token');
+    }
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.accessToken;
+  }
+
+  get authState$(): Observable<boolean> {
+    return this._authenticated.asObservable();
+  }
+
+  logout(): void {
+    // Supprimer toutes les données d'authentification
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('token');
+    localStorage.removeItem('userData');
+    
+    // Mettre à jour l'état d'authentification
+    this._authenticated.next(false);
+    
+    // Rediriger vers la page de login
+    this._router.navigate(['/auth/sign-in']);
+  }
+
+  set accessToken(token: string) {
+    localStorage.setItem('accessToken', token);
+    this._authenticated.next(true);
+  }
+
+  get accessToken(): string {
+    return localStorage.getItem('accessToken') ?? '';
+  }
+
+  signIn(credentials: { email: string; password: string }): Observable<any> {
+    if (this._authenticated.value) {
+      return throwError(() => new Error('User is already logged in.'));
     }
 
-    // Utiliser l'URL de l'API depuis l'environnement
     const loginUrl = `${environment.baseUrl}/users/login`;
 
     return this._httpClient.post(loginUrl, credentials).pipe(
-        switchMap((response: any) => {
-            if (response && response.token) {
-                // Stocker le token d'accès dans le local storage
-                this.accessToken = response.token;
-
-                // Marquer l'utilisateur comme authentifié
-                this._authenticated = true;
-console.log(this._authenticated)
-                // Retourner une nouvelle observable avec la réponse
-                return of(response);
-            } else {
-                return throwError('Login failed: Invalid response structure.');
-            }
-        }),
-        catchError((error) => {
-            // Gestion des erreurs
-            return throwError(error);
-        })
+      switchMap((response: any) => {
+        if (response?.token) {
+          // Stocker le token
+          this.accessToken = response.token;
+          
+          // Stocker les données utilisateur si disponibles
+          if (response.user) {
+            localStorage.setItem('userData', JSON.stringify(response.user));
+          }
+          
+          return of(response);
+        }
+        return throwError(() => new Error('Login failed: Invalid response structure.'));
+      }),
+      catchError((error) => {
+        return throwError(() => error);
+      })
     );
-}
-
-
-
+  }
 }

@@ -28,6 +28,8 @@ import { ValidateurDetailsComponent } from './components/validateur-details/vali
 import { ValidateursClotureComponent } from './components/validateurs-cloture/validateurs-cloture.component';
 import { SeverityListComponent } from './severity/severity-list/severity-list.component';
 import { ProductListComponent } from './product-list/product-list.component';
+import { MatSnackBarModule  } from '@angular/material/snack-bar';
+
 
 @NgModule({
   declarations: [
@@ -47,7 +49,7 @@ import { ProductListComponent } from './product-list/product-list.component';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    AdminRoutingModule, HttpClientModule,MatToolbarModule,
+    AdminRoutingModule, HttpClientModule,MatToolbarModule,MatSnackBarModule ,
     MatSidenavModule,
     MatCardModule,
     MatTableModule,

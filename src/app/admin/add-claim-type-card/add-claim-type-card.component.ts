@@ -134,7 +134,7 @@ submit() {
       ValidatorIds: [],
       ClosureResponsibleIds: []
     };
-
+console.log(payload)
     this.claimTypesService.addClaimType(payload).subscribe(
       (response) => {
         console.log('Type de réclamation ajouté avec succès', response);
