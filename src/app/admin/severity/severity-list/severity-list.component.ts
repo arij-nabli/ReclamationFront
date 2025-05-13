@@ -17,8 +17,15 @@ export class SeverityListComponent implements OnInit {
   showDeleteModal = false;
   actionMenuOpen: string | null = null;
   addSeverityForm!: FormGroup;
+  
+  // Notifications
+  showSuccessNotification = false;
+  successMessage = '';
+  showErrorNotification = false;
+  errorMessage = '';
   showConstraintNotification = false;
-constraintMessage = '';
+  constraintMessage = '';
+  
   // Pagination
   pageSize = 5;
   currentPage = 0;
@@ -41,8 +48,7 @@ constraintMessage = '';
 
   constructor(
     private severityService: SeverityService, 
-    private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
@@ -184,47 +190,74 @@ constraintMessage = '';
     this.actionMenuOpen = null;
   }
 
-  // Méthodes pour gérer la notification
-private showConstraintError(message: string): void {
-  this.constraintMessage = message;
-  this.showConstraintNotification = true;
-  
+  // Méthodes pour gérer les notifications
+  private showSuccess(message: string): void {
+    this.successMessage = message;
+    this.showSuccessNotification = true;
+    setTimeout(() => {
+      this.hideSuccessNotification();
+    }, 3000);
+  }
 
-}
 
-hideConstraintNotification(): void {
-  this.showConstraintNotification = false;
-}
 
-// Modifiez la méthode deleteSeverity
-deleteSeverity(): void {
-  if (!this.severityToDelete?.id) return;
+  private showError(message: string): void {
+    this.errorMessage = message;
+    this.showErrorNotification = true;
+    setTimeout(() => {
+      this.hideErrorNotification();
+    }, 5000);
+  }
 
-  this.severityService.deleteSeverity(this.severityToDelete.id).subscribe({
-    next: () => {
-      this.showSuccess('Niveau de gravité supprimé avec succès');
-      this.loadSeverities();
-      this.showDeleteModal = false;
-    },
-    error: (err) => {
-      console.error('Erreur complète:', err);
-      
-      if (err.status === 500 && typeof err.error === 'string' && 
-          err.error.includes('est utilisé dans des réclamations')) {
-        this.showConstraintError('Impossible de supprimer : ce niveau de gravité est utilisé dans des réclamations existantes');
-      } else {
-        this.showError('Erreur lors de la suppression du niveau de gravité');
+
+
+  private showConstraintError(message: string): void {
+    this.constraintMessage = message;
+    this.showConstraintNotification = true;
+  }
+
+
+  deleteSeverity(): void {
+    if (!this.severityToDelete?.id) return;
+
+    this.severityService.deleteSeverity(this.severityToDelete.id).subscribe({
+      next: () => {
+        this.showSuccess('Niveau de gravité supprimé avec succès');
+        this.loadSeverities();
+        this.showDeleteModal = false;
+      },
+      error: (err) => {
+        console.error('Erreur complète:', err);
+        
+        if (err.status === 500 && typeof err.error === 'string' && 
+            err.error.includes('est utilisé dans des réclamations')) {
+          this.showConstraintError('Impossible de supprimer : ce niveau de gravité est utilisé dans des réclamations existantes');
+        } else {
+          this.showError('Erreur lors de la suppression du niveau de gravité');
+        }
+        
+        this.showDeleteModal = false;
       }
-      
-      this.showDeleteModal = false;
-    }
-  });
-}
+    });
+  }
+
   // UI helpers
   toggleActionMenu(id: string | undefined): void {
     this.actionMenuOpen = id ? (this.actionMenuOpen === id ? null : id) : null;
   }
+// Modifiez ces méthodes de private à public
+public hideSuccessNotification(): void {
+  this.showSuccessNotification = false;
+}
 
+public hideErrorNotification(): void {
+  this.showErrorNotification = false;
+}
+
+// Et aussi pour la méthode de contrainte si elle est utilisée dans le template
+public hideConstraintNotification(): void {
+  this.showConstraintNotification = false;
+}
   cancelAdd(): void {
     this.showAddForm = false;
     this.resetNewSeverity();
@@ -239,20 +272,5 @@ deleteSeverity(): void {
       label: '',
       gravityCoefficient: 1
     };
-  }
-
-  // Notification methods
-  private showSuccess(message: string): void {
-    this.snackBar.open(message, 'Fermer', {
-      duration: 3000,
-      panelClass: ['success-snackbar']
-    });
-  }
-
-  private showError(message: string): void {
-    this.snackBar.open(message, 'Fermer', {
-      duration: 5000,
-      panelClass: ['error-snackbar']
-    });
   }
 }

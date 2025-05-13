@@ -1,0 +1,110 @@
+/* Animation de spin pour le chargement */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+  
+  /* Style pour les badges de statut/gravité */
+  .bg-blue-100 { background-color: #dbeafe; }
+  .text-blue-800 { color: #1e40af; }
+  .bg-yellow-100 { background-color: #fef3c7; }
+  .text-yellow-800 { color: #92400e; }
+  .bg-green-100 { background-color: #d1fae5; }
+  .text-green-800 { color: #065f46; }
+  .bg-red-100 { background-color: #fee2e2; }
+  .text-red-800 { color: #991b1b; }
+  /* Animation de chargement */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Styles de base */
+.container {
+  max-width: 1200px;
+}
+
+/* Styles des statuts */
+.bg-blue-100 {
+  background-color: #dbeafe;
+}
+.text-blue-800 {
+  color: #1e40af;
+}
+.bg-yellow-100 {
+  background-color: #fef3c7;
+}
+.text-yellow-800 {
+  color: #92400e;
+}
+.bg-green-100 {
+  background-color: #d1fae5;
+}
+.text-green-800 {
+  color: #065f46;
+}
+.bg-red-100 {
+  background-color: #fee2e2;
+}
+.text-red-800 {
+  color: #991b1b;
+}
+
+/* Styles de la table */
+table {
+  table-layout: auto;
+}
+th {
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+td {
+  vertical-align: top;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* Styles des boutons */
+button {
+  transition: all 0.2s ease;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Styles de pagination */
+nav button:not(:last-child) {
+  margin-right: -1px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .min-w-xs {
+    min-width: 100px;
+  }
+  .px-6 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .py-4 {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+}
+  /* Style pour le modal */
+  .fixed {
+    position: fixed;
+  }
+  .inset-0 {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+  .z-50 {
+    z-index: 50;
+  }

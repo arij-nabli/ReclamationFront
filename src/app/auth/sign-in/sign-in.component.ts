@@ -62,7 +62,10 @@ export class SignInComponent {
             this.router.navigate(['admin/AdminDashbord']);
           } else if (role === 'Client') {
             this.router.navigate(['claim/add']);
-          } else {
+          } 
+          else if (role === 'Agent') {
+            this.router.navigate(['agent/decision']);
+          }else {
             this.errorMessage = 'Rôle utilisateur inconnu.';
           }
         } else {

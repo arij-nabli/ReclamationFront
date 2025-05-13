@@ -27,6 +27,7 @@ export class AddClaimComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
   clientId: any | null = null;
+  showModal = false;
 
   constructor(
     private router: Router,
@@ -43,14 +44,14 @@ export class AddClaimComponent implements OnInit {
       claimTypeId: ['', Validators.required],
       productId: ['', Validators.required],
       severityId: ['', Validators.required],
-      customFields: this.fb.array([]) ,
-   
+      customFields: this.fb.array([])
     });
   }
 
   ngOnInit(): void {
     this.initializeData();
   }
+
   get customFields(): FormArray {
     return this.claimForm.get('customFields') as FormArray;
   }
@@ -66,6 +67,24 @@ export class AddClaimComponent implements OnInit {
     this.customFields.removeAt(index);
   }
   
+  openModal(): void {
+    this.showModal = true;
+    document.body.style.overflow = 'hidden';
+    this.resetForm();
+  }
+
+  closeModal(): void {
+    if (this.claimForm.dirty) {
+      if (confirm('Voulez-vous vraiment annuler ? Les modifications non enregistrées seront perdues.')) {
+        this.showModal = false;
+        document.body.style.overflow = 'auto';
+      }
+    } else {
+      this.showModal = false;
+      document.body.style.overflow = 'auto';
+    }
+  }
+
   private initializeData(): void {
     this.clientId = this.authService.getUserId();
     
@@ -87,7 +106,6 @@ export class AddClaimComponent implements OnInit {
       error: (error) => this.handleError(error, 'claim types')
     });
   
-    // Charger les produits
     this.productService.getAllProducts().subscribe({
       next: (response: any) => {
         this.products = response.$values || [];
@@ -138,13 +156,15 @@ export class AddClaimComponent implements OnInit {
       productId: formValue.productId,
       customFieldsJson: JSON.stringify(customFieldsObj)
     };
-  
+
     this.claimService.submitClaim(this.clientId!, claimData, this.selectedFiles).subscribe({
       next: (response) => {
         this.isLoading = false;
         this.successMessage = 'Réclamation soumise avec succès!';
         this.resetForm();
-        setTimeout(() => this.router.navigate(['/claims']), 1500);
+        this.showModal = false;
+        document.body.style.overflow = 'auto';
+        setTimeout(() => this.router.navigate(['/claim/cc']), 1500);
       },
       error: (error) => {
         this.isLoading = false;
@@ -154,37 +174,16 @@ export class AddClaimComponent implements OnInit {
     });
   }
 
-  private handleSuccess(): void {
-    this.isLoading = false;
-    this.successMessage = 'Claim submitted successfully!';
-    this.resetForm();
-    setTimeout(() => this.router.navigate(['/claims']), 1500);
-  }
-
-  private handleSubmissionError(error: any): void {
-    this.isLoading = false;
-    console.error('Submission error:', error);
-    this.errorMessage = error.error?.message || 'Failed to submit claim. Please try again.';
-  }
-
   private handleError(error: any, context: string): void {
     console.error(`Error during ${context}:`, error);
     this.errorMessage = `An error occurred. Please try again later.`;
   }
 
-  cancel(): void {
-    if (this.claimForm.dirty) {
-      if (confirm('Are you sure? Unsaved changes will be lost.')) {
-        this.router.navigate(['/claims']);
-      }
-    } else {
-      this.router.navigate(['/claims']);
-    }
-  }
-
   private resetForm(): void {
     this.claimForm.reset();
     this.selectedFiles = [];
+    this.successMessage = '';
+    this.errorMessage = '';
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {

@@ -54,6 +54,9 @@ import { MatSnackBarModule  } from '@angular/material/snack-bar';
     MatCardModule,
     MatTableModule,
     MatPaginatorModule,MatIconModule ,MatProgressSpinnerModule ,MatFormFieldModule ,MatSelectModule,MatCheckboxModule
+  ],
+  exports: [ // Ajoutez cette section
+    NavbarComponent
   ]
 })
 export class AdminModule { }

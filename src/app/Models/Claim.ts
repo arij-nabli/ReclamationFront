@@ -10,21 +10,45 @@ export class Claim {
   id?: string;
   title: string;
   description: string;
-  claimTypeId: string;
-  productId: string;
-  severityId: string;
+  claimType: ClaimType;
+  product: Product;
+  customFieldsJson: string = '{}';
+  submissionDate?: string;
+  treatmentDescription?:string;
+
+  closureDate?:string;
+
+  isClosureValidated?:boolean;
+
+  closureValidationComment?:string;
+treatmentDate?:string;
+  severity: Severity;
   status: ClaimStatus;
   creationDate: string;
   clientId: string;
   files?: string[]; // URLs des fichiers joints
 
+  // Propriété calculée pour accéder aux champs personnalisés
+  get customFields(): Record<string, any> {
+    try {
+      return this.customFieldsJson ? JSON.parse(this.customFieldsJson) : {};
+    } catch {
+      return {};
+    }
+  }
+
+  set customFields(fields: Record<string, any>) {
+    this.customFieldsJson = JSON.stringify(fields);
+  }
+
   constructor(
     title: string,
     description: string,
-    claimTypeId: string,
-    productId: string,
-    severityId: string,
+    claimType: ClaimType,
+    product: Product,
+    severity: Severity,
     clientId: string,
+    customFieldsJson: string = '{}',
     status: ClaimStatus = ClaimStatus.Pending,
     creationDate: string = new Date().toISOString(),
     id?: string,
@@ -33,12 +57,13 @@ export class Claim {
     this.id = id;
     this.title = title;
     this.description = description;
-    this.claimTypeId = claimTypeId;
-    this.productId = productId;
-    this.severityId = severityId;
+    this.claimType = claimType;
+    this.product = product;
+    this.severity = severity;
     this.status = status;
     this.creationDate = creationDate;
     this.clientId = clientId;
+    this.customFieldsJson = customFieldsJson;
     this.files = files;
   }
 
@@ -47,10 +72,11 @@ export class Claim {
     return new Claim(
       json.title,
       json.description,
-      json.claimTypeId,
-      json.productId,
-      json.severityId,
+      json.claimType,
+      json.product,
+      json.severity,
       json.clientId,
+      json.customFieldsJson || '{}',
       json.status as ClaimStatus,
       json.creationDate,
       json.id,
@@ -64,13 +90,39 @@ export class Claim {
       id: this.id,
       title: this.title,
       description: this.description,
-      claimTypeId: this.claimTypeId,
-      productId: this.productId,
-      severityId: this.severityId,
+      claimType: this.claimType,
+      product: this.product,
+      severity: this.severity,
       status: this.status,
       creationDate: this.creationDate,
       clientId: this.clientId,
+      customFieldsJson: this.customFieldsJson,
       files: this.files
     };
+  }
+
+  // Méthodes utilitaires pour les champs personnalisés
+  getCustomField<T>(key: string, defaultValue?: T): T {
+    return this.customFields[key] ?? defaultValue;
+  }
+
+  setCustomField(key: string, value: any): void {
+    const fields = this.customFields;
+    fields[key] = value;
+    this.customFields = fields;
+  }
+
+  removeCustomField(key: string): boolean {
+    const fields = this.customFields;
+    const exists = key in fields;
+    if (exists) {
+      delete fields[key];
+      this.customFields = fields;
+    }
+    return exists;
+  }
+
+  hasCustomField(key: string): boolean {
+    return key in this.customFields;
   }
 }

@@ -1,0 +1,217 @@
+<div class="flex min-h-screen bg-gray-50">
+    <app-agentsidebar></app-agentsidebar>
+    
+    <div class="container mx-auto p-4">
+      <h1 class="text-2xl font-bold mb-6">Décisions à valider</h1>
+  
+      <!-- Chargement -->
+      <div *ngIf="loading" class="text-center py-8">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <p class="mt-2">Chargement des décisions...</p>
+      </div>
+  
+      <!-- Aucune décision -->
+      <div *ngIf="!loading && decisions.length === 0" class="text-center py-8">
+        <div class="bg-gray-100 p-6 rounded-lg max-w-md mx-auto">
+          <p class="mt-4 text-gray-600">Aucune décision à valider</p>
+        </div>
+      </div>
+  
+      <!-- Tableau des décisions -->
+      <div *ngIf="!loading && decisions.length > 0" class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Réclamation</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Décideur</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Décision</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let decision of decisions" class="hover:bg-gray-50">
+              <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
+                {{ decision.description || '-' }}
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-900">
+                {{ decision.client?.firstName }} {{ decision.client?.lastName || '-' }}
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-900">
+                {{ decision.
+                  decider?.firstName|| '-' }}  {{ decision.
+                    decider?.lastName || '-' }}
+              </td>
+              <td class="px-6 py-4">
+                <span [class]="getDecisionClass(decision.status)" class="px-2 py-1 rounded-full text-xs">
+                  {{ decision.status }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-900">
+                {{ decision.decisionDate | date:'dd/MM/yyyy' }}
+              </td>
+              <td class="px-6 py-4 text-sm font-medium space-x-2">
+                <button (click)="openDetailModal(decision)" 
+                        class="text-blue-600 hover:text-blue-900 px-3 py-1 border border-blue-600 rounded-md">
+                  Consulter
+                </button>
+                <button (click)="openValidationModal(decision)" 
+                        class="text-green-600 hover:text-green-900 px-3 py-1 border border-green-600 rounded-md">
+                  Valider
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  
+      <!-- Modal de consultation -->
+      <div *ngIf="showDetailModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+              <h2 class="text-xl font-bold text-gray-800">Détails de la décision</h2>
+              <button (click)="closeModals()" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+  
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Colonne gauche -->
+              <div class="space-y-4">
+                <div class="border-b pb-4">
+                  <h3 class="font-semibold text-lg text-blue-600 mb-2">Décision</h3>
+                  <p><span class="font-medium">Statut:</span> 
+                    <span [class]="getDecisionClass(selectedDecision.status)" class="px-2 py-1 rounded-full text-xs">
+                      {{ selectedDecision.status }}
+                    </span>
+                  </p>
+                  <p><span class="font-medium">Date:</span> {{ selectedDecision.decisionDate | date:'dd/MM/yyyy HH:mm' }}</p>
+                  <p><span class="font-medium">Décideur:</span> {{ selectedDecision.decider?.firstName }}  {{  selectedDecision.
+                      decider?.lastName || '-' }}
+  
+                <div class="border-b pb-4">
+                  <h3 class="font-semibold text-lg text-blue-600 mb-2">Commentaire</h3>
+                  <p class="whitespace-pre-line">{{ selectedDecision.comment || 'Aucun commentaire' }}</p>
+                </div>
+              </div>
+  
+              <!-- Colonne droite -->
+              <div class="space-y-4">
+                <div class="border-b pb-4">
+                  <h3 class="font-semibold text-lg text-blue-600 mb-2">Réclamation</h3>
+   
+                  <p><span class="font-medium">Description:</span> {{ selectedDecision.description || '-' }}</p>
+                  <div class="border-b pb-4">
+                    <h3 class="font-semibold text-lg text-blue-600 mb-2">Client</h3>
+                    <p><span class="font-medium">Nom:</span> {{ selectedDecision.client?.firstName }} {{ selectedDecision.client?.lastName || '-' }}</p>
+                    <p><span class="font-medium">Email:</span> {{ selectedDecision.client?.email || '-' }}</p>
+                    <div class="border-b pb-4">
+                      <h3 class="font-semibold text-lg text-blue-600 mb-2">Produit concerné</h3>
+                      <p><span class="font-medium">Nom:</span> {{ selectedDecision.product?.productName || '-' }}</p>
+                      <p><span class="font-medium">Code:</span> {{ selectedDecision.product?.productCode || '-' }}</p>
+                    </div>
+                  </div>
+                </div>
+            
+           
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+      <!-- Modal de validation -->
+  
+<  <div *ngIf="showValidationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+    <div class="p-6">
+      <div class="flex justify-between items-start mb-4">
+        <h2 class="text-xl font-bold text-gray-800">Valider la décision</h2>
+        <button (click)="closeModals()" class="text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Section Informations (fond bleu clair) -->
+      <div class="bg-blue-50 p-4 rounded-lg mb-6">
+        <h3 class="font-semibold text-lg text-blue-800 mb-3">Informations sur la décision</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Colonne gauche -->
+          <div class="space-y-2">
+            <p><span class="font-medium text-blue-700">Statut:</span> 
+              <span [class]="getDecisionClass(selectedDecision.status)" class="px-2 py-1 rounded-full text-xs">
+                {{ selectedDecision.status }}
+              </span>
+            </p>
+            <p><span class="font-medium text-blue-700">Date:</span> 
+              <span class="text-blue-900">{{ selectedDecision.decisionDate | date:'dd/MM/yyyy HH:mm' }}</span>
+            </p>
+          </div>
+          
+          <!-- Colonne droite -->
+          <div class="space-y-2">
+            <p><span class="font-medium text-blue-700">Décideur:</span> 
+              <span class="text-blue-900">
+                {{ selectedDecision.decider?.firstName }} {{ selectedDecision.decider?.lastName || '-' }}
+              </span>
+            </p>
+            <p><span class="font-medium text-blue-700">Traitement à faire:</span> 
+              <span class="text-blue-900">{{ selectedDecision.decisionText || 'Aucun commentaire' }}</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Responsable de traitement -->
+        <div class="mt-4 pt-4 border-t border-blue-200">
+          <p><span class="font-medium text-blue-700">Responsable assigné:</span> 
+            <span *ngIf="selectedDecision.treatmentResponsibleId; else notAssigned" class="text-blue-900">
+              {{ treatmentResponsibleName }}
+              <span class="text-sm text-blue-600">(Email: {{ treatmentResponsibleEmail }})</span>
+            </span>
+            <ng-template #notAssigned>
+              <span class="text-blue-900 italic">Non assigné</span>
+            </ng-template>
+          </p>
+        </div>
+      </div>
+
+      <!-- Section Commentaire (fond gris clair) -->
+      <div class="bg-gray-50 p-4 rounded-lg mb-6">
+        <h3 class="font-semibold text-lg text-gray-700 mb-3">Votre validation</h3>
+        
+        <div class="mb-4">
+          <label for="validationComment" class="block text-sm font-medium text-gray-700 mb-2">
+            Ajoutez un commentaire
+          </label>
+          <textarea id="validationComment" [(ngModel)]="validationComment" name="validationComment" rows="4"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    placeholder="Expliquez votre décision de validation..."></textarea>
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-2">
+          <button type="button" (click)="closeModals()" 
+                  class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-100 transition-colors">
+            Annuler
+          </button>
+          <button type="button" (click)="validateDecision(false)" 
+                  class="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 transition-colors">
+            Rejeter
+          </button>
+          <button type="button" (click)="validateDecision(true)" 
+                  class="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 transition-colors">
+            Valider
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>

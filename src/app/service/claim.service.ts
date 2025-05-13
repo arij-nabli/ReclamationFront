@@ -11,6 +11,9 @@ export class ClaimService {
   private apiUrl = `${environment.baseUrl}/Claim`;
 
   constructor(private http: HttpClient) { }
+  getClaimsByClientId(clientId: string): Observable<Claim[]> {
+    return this.http.get<Claim[]>(`${this.apiUrl}/client/${clientId}`);
+  }
 
   submitClaim(clientId: string, claimData: any, files: File[]): Observable<any> {
     const formData = new FormData();
@@ -35,4 +38,87 @@ export class ClaimService {
     const url = `${this.apiUrl}/submit?clientId=${clientId}`;
     return this.http.post(url, formData);
   }
+   // Nouvelles méthodes pour le workflow agent
+   getPendingClaims(agentId: string): Observable<Claim[]> {
+    return this.http.get<Claim[]>(`${this.apiUrl}/pending/${agentId}`);
+  }
+  processClaimByDecider(
+    claimId: string,
+    deciderId: string,
+    treatmentResponsibleId: string,
+    decisionComments?: string
+  ): Observable<any> {
+    const payload = {
+      deciderId,
+      treatmentResponsibleId,
+      decisionComments
+    };
+
+    return this.http.put(`${this.apiUrl}/process/${claimId}`, payload);
+  }
+
+  getClaimsToValidate(agentId: string): Observable<Claim[]> {
+    return this.http.get<Claim[]>(`${this.apiUrl}/to-validate/${agentId}`);
+  }
+
+  getClaimsToTreat(agentId: string): Observable<Claim[]> {
+    return this.http.get<Claim[]>(`${this.apiUrl}/to-treat/${agentId}`);
+  }
+
+  getClaimsToClose(agentId: string): Observable<Claim[]> {
+    return this.http.get<Claim[]>(`${this.apiUrl}/to-close/${agentId}`);
+  }
+
+  getAgentProcessedClaims(agentId: string): Observable<Claim[]> {
+    return this.http.get<Claim[]>(`${this.apiUrl}/processed/${agentId}`);
+  }
+
+  getClaimsByStatus(agentId: string, status: string): Observable<Claim[]> {
+    return this.http.get<Claim[]>(`${this.apiUrl}/by-status/${agentId}/${status}`);
+  }
+
+
+  validateDecision(
+    claimId: string,
+    validatorId: string,
+    isApproved: boolean,
+    validationComments?: string
+  ): Observable<any> {
+    const payload = {
+      validatorId,
+    isApproved,
+    validationComments,
+    };
+
+    return this.http.put(`${this.apiUrl}/validate/${claimId}`, payload);
+  }
+
+  processByTreatment(
+    claimId: string,
+    treatmentResponsibleId: string,
+
+    treatmentComments?: string
+  ): Observable<any> {
+    const payload = {
+      treatmentResponsibleId,
+  
+      treatmentComments,
+    }; 
+    return this.http.put<Claim>(`${this.apiUrl}/processByTreatment/${claimId}`, payload);
+  }
+  validateClosure(
+    claimId: string,
+    isApproved: boolean,
+    comment: string,
+    closureResponsibleId: string
+  ): Observable<any> {
+    const payload = {
+      isApproved,
+      comment,
+      closureResponsibleId
+    };
+  
+    return this.http.put(`${this.apiUrl}/validate-closure/${claimId}`, payload);
+  }
+
 }

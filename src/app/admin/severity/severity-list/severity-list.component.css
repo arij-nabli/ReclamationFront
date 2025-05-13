@@ -8,17 +8,7 @@
     background-color: #F44336;
     color: white;
   }
-  /* Animation pour la notification */
-@keyframes slideDown {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
+
 
 .fixed.top-0 {
   animation: slideDown 0.3s ease-out forwards;

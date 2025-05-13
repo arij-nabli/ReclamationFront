@@ -13,9 +13,13 @@ const routes: Routes = [
   {
     path: 'admin',
     loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule),
-    canActivate: [AuthGuard] // Protéger l'admin
+    canActivate: [AuthGuard] 
   },
   { path: '', redirectTo: 'auth/sign-in', pathMatch: 'full' },
+  {
+    path: 'agent',
+    loadChildren: () => import('./agent/agent.module').then(m => m.AgentModule)
+  },
   {
     path: 'claim',
     loadChildren: () => import('./claim/claim.module').then(m => m.ClaimModule),

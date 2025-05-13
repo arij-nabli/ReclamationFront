@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AdminModule } from './admin/admin.module';
 import { ClaimModule } from './claim/claim.module';
+import { AgentModule } from './agent/agent.module';
 
 
 
@@ -16,6 +17,7 @@ import { ClaimModule } from './claim/claim.module';
     
   ],
   imports: [
+    AgentModule,
     BrowserModule,
     AppRoutingModule,
     AuthModule,

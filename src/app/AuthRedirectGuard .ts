@@ -20,7 +20,10 @@ export class AuthRedirectGuard implements CanActivate {
           this.router.navigate(['/claim/add']);
         } else if (role === 'Admin') {
           this.router.navigate(['/admin/AdminDashbord']);
-        } else {
+        }else if 
+        (role === 'Agent') {
+          this.router.navigate(['/agent/decision']);
+        }else {
           this.router.navigate(['/']); // fallback
         }
       }
