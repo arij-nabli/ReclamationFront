@@ -11,25 +11,35 @@ export class AuthRedirectGuard implements CanActivate {
 
   canActivate(): boolean {
     if (this.authService.isAuthenticated()) {
-      const token = localStorage.getItem('token');
-      
-      if (token) {
-        const role = this.decodeToken(token)?.role; // <-- Assure-toi que le token contient bien "role"
-        
-        if (role === 'Client') {
-          this.router.navigate(['/claim/add']);
-        } else if (role === 'Admin') {
-          this.router.navigate(['/admin/AdminDashbord']);
-        }else if 
-        (role === 'Agent') {
-          this.router.navigate(['/agent/decision']);
-        }else {
-          this.router.navigate(['/']); // fallback
-        }
-      }
-      return false; // On bloque l’accès à /auth
+      this.redirectBasedOnRole();
+      return false; // Bloque l'accès à /auth pour les utilisateurs connectés
     }
-    return true; // Non authentifié → accès à /auth autorisé
+    return true; // Autorise l'accès à /auth pour les non-authentifiés
+  }
+
+  private redirectBasedOnRole(): void {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      this.router.navigate(['/']);
+      return;
+    }
+
+    const role = this.decodeToken(token)?.role;
+    
+    switch(role) {
+      case 'Client':
+        this.router.navigate(['/claim/add']);
+        break;
+      case 'Admin':
+        this.router.navigate(['/admin/AdminDashbord']);
+        break;
+      case 'Agent':
+        this.router.navigate(['/agent/decision']);
+        break;
+      default:
+        this.router.navigate(['/']);
+    }
   }
 
   private decodeToken(token: string): any {

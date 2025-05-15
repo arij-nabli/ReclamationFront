@@ -23,6 +23,7 @@ import { AgentsidebarComponent } from './agentsidebar/agentsidebar.component';
 import { ValidationDecisionComponent } from './validation-decision/validation-decision.component';
 import { TreatmentPanelComponent } from './treatment-panel/treatment-panel.component';
 import { ClosureValidationComponent } from './closure-validation/closure-validation.component';
+import { AgentclaimComponent } from './agentclaim/agentclaim.component';
 
 
 @NgModule({
@@ -32,7 +33,8 @@ import { ClosureValidationComponent } from './closure-validation/closure-validat
     AgentsidebarComponent,
     ValidationDecisionComponent,
     TreatmentPanelComponent,
-    ClosureValidationComponent
+    ClosureValidationComponent,
+    AgentclaimComponent
   ],
   imports: [
     CommonModule,

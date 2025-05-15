@@ -12,7 +12,7 @@ import { AgentserviceService } from 'src/app/admin/adminservice/agentservice/age
 export class ValidationDecisionComponent implements OnInit {
   decisions: any[] = [];
   loading = false;
-  selectedDecision: any = null;
+ selectedClaim: any = null;
   showDetailModal = false;
   showValidationModal = false;
   validationComment = '';
@@ -62,14 +62,14 @@ export class ValidationDecisionComponent implements OnInit {
   }
 
   openDetailModal(decision: any): void {
-    this.selectedDecision = decision;
+    this.selectedClaim = decision;
     this.showDetailModal = true;
     
     
   }
 
   openValidationModal(decision: any): void {
-    this.selectedDecision = decision;
+    this.selectedClaim = decision;
     this.validationComment = '';
     this.showValidationModal = true;
     
@@ -94,8 +94,8 @@ export class ValidationDecisionComponent implements OnInit {
     });
   }
 
-validateDecision(isApproved: boolean): void {
-  if (!this.selectedDecision) {
+validateClaim(isApproved: boolean): void {
+  if (!this.selectedClaim) {
       this.snackBar.open('Aucune décision sélectionnée', 'Fermer', { duration: 3000 });
       return;
   }
@@ -103,7 +103,7 @@ validateDecision(isApproved: boolean): void {
   this.loading = true;
   
   this.decisionService.validateDecision(
-      this.selectedDecision.id, // claimId en premier paramètre
+      this.selectedClaim.id, // claimId en premier paramètre
       this.authService.getUserId(), // validatorId
       isApproved, // isApproved
       this.validationComment // validationComments (optionnel)
@@ -133,9 +133,23 @@ validateDecision(isApproved: boolean): void {
   closeModals(): void {
     this.showDetailModal = false;
     this.showValidationModal = false;
-    this.selectedDecision = null;
+    this.selectedClaim = null;
     this.validationComment = '';
     this.selectedResponsible = null;
+  }
+   getSeverityLabel(severity: any): string {
+    if (!severity) return 'Non spécifiée';
+    return `${severity.label} (Niveau ${severity.gravityCoefficient})`;
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'Pending': return 'bg-yellow-100 text-yellow-800';
+      case 'Approved': return 'bg-green-100 text-green-800';
+      case 'DecisionRejected': 
+      return 'bg-red-100 text-red-800 border border-red-200';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   }
 
   getDecisionClass(status: string): string {

@@ -77,7 +77,9 @@ export class ClaimService {
     return this.http.get<Claim[]>(`${this.apiUrl}/by-status/${agentId}/${status}`);
   }
 
-
+  getClaims(agentId: string): Observable<Claim[]> {
+    return this.http.get<Claim[]>(`${this.apiUrl}/by-claim/${agentId}`);
+  }
   validateDecision(
     claimId: string,
     validatorId: string,

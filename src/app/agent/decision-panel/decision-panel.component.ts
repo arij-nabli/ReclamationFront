@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AgentserviceService } from 'src/app/admin/adminservice/agentservice/agentservice.service';
 import { AuthService } from 'src/app/auth/authservice/auth.service';
+import { Claim } from 'src/app/Models/Claim';
 import { ClaimService } from 'src/app/service/claim.service';
 
 ClaimService
@@ -20,10 +21,16 @@ export class DecisionPanelComponent implements OnInit {
   showModal = false;
   treatmentResponsibles: any[] = [];
   selectedResponsible: string = ''; // Initialize with empty string
-  decisionComment: string = ''; // Initialize with empty string
+  decisionComment: string = '';
+   // Initialize with empty string
   showDetailModal = false;
   showDecisionModal = false;
   showRejectionDetailsModal = false;
+    pageSize = 5;
+  currentPage = 0;
+  length = 0;
+  totalPages = 0;
+   filteredClaims: any;
   constructor(
     private snackBar: MatSnackBar,
     private claimService: ClaimService,
@@ -127,7 +134,9 @@ export class DecisionPanelComponent implements OnInit {
     this.claimService.getPendingClaims(this.agentId).subscribe({
       next: (response: any) => {
         this.claims = response.$values || [];
-        console.log( this.claims);
+          this.filteredClaims = [...this.claims];
+        this.calculateTotalPages();
+     
         this.loading = false;
       },
       error: () => {
@@ -136,7 +145,40 @@ export class DecisionPanelComponent implements OnInit {
       }
     });
   }
+  
+  get paginatedClaims(): Claim[] {
+    const start = this.currentPage * this.pageSize;
+    return this.filteredClaims.slice(start, start + this.pageSize);
+  }
 
+  onPageSizeChange(): void {
+    this.currentPage = 0; // Réinitialiser à la première page
+    this.calculateTotalPages();
+  }
+
+  calculateTotalPages(): void {
+    this.totalPages = Math.ceil(this.filteredClaims.length / this.pageSize);
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+    }
+  }
+
+  goToFirstPage(): void {
+    this.currentPage = 0;
+  }
+
+  goToLastPage(): void {
+    this.currentPage = this.totalPages - 1;
+  }
   getSeverityLabel(severity: any): string {
     if (!severity) return 'Non spécifiée';
     return `${severity.label} (Niveau ${severity.gravityCoefficient})`;

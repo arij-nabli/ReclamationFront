@@ -5,22 +5,34 @@ import { CanActivate, Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-
   constructor(private router: Router) {}
 
   canActivate(): boolean {
     const token = localStorage.getItem('token');
-  
-    if (token) {
-      const payload = token.split('.')[1];
-      const decodedPayload = JSON.parse(atob(payload));
-      console.log(decodedPayload);
-      if (decodedPayload.role === 'Admin') {
-        return true; // autorisé
-      }
+    
+    if (!token) {
+      this.router.navigate(['/auth/sign-in']);
+      return false;
     }
 
-    this.router.navigate(['/auth/sign-in']); // sinon redirige vers login
+    try {
+      const payload = token.split('.')[1];
+      const decodedPayload = JSON.parse(atob(payload));
+      
+      // Vérifie à la fois le rôle et l'expiration du token
+      if (decodedPayload.role ) {
+        return true;
+      }
+    } catch (error) {
+      console.error('Erreur de décodage du token', error);
+    }
+
+    this.router.navigate(['/auth/sign-in']);
     return false;
+  }
+
+  private isTokenExpired(decodedToken: any): boolean {
+    if (!decodedToken.exp) return false;
+    return Date.now() >= decodedToken.exp * 1000;
   }
 }

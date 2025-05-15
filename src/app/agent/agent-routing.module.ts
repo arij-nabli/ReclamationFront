@@ -6,8 +6,9 @@ import { DecisionPanelComponent } from './decision-panel/decision-panel.componen
 import { ValidationDecisionComponent } from './validation-decision/validation-decision.component';
 import { TreatmentPanelComponent } from './treatment-panel/treatment-panel.component';
 import { ClosureValidationComponent } from './closure-validation/closure-validation.component';
+import { AgentclaimComponent } from './agentclaim/agentclaim.component';
 
-ClosureValidationComponent
+AgentclaimComponent
 
 const routes: Routes = [
    { path: 'agent', component: AgentDashboardComponent },
@@ -15,6 +16,8 @@ const routes: Routes = [
    { path: 'validation', component: ValidationDecisionComponent },
    { path: 'treatment', component: TreatmentPanelComponent },
    { path: 'closure', component: ClosureValidationComponent},
+      { path: 'claims-agent', component: AgentclaimComponent},
+
 ];
 
 

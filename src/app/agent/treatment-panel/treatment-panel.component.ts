@@ -17,7 +17,7 @@ export class TreatmentPanelComponent implements OnInit {
   showProcessingModal = false;
   processingComment = '';
   agentId: any;
-
+  showRejectionDetailsModal = false;
   constructor(
     private snackBar: MatSnackBar,
     private claimService: ClaimService,
@@ -54,7 +54,10 @@ export class TreatmentPanelComponent implements OnInit {
     this.showDetailModal = false;
     this.showProcessingModal = true;
   }
-
+  openRejectionDetailsModal(claim: any): void {
+    this.selectedClaim = claim;
+    this.showRejectionDetailsModal = true;
+  }
   completeProcessing(): void {
     if (!this.selectedClaim || !this.processingComment) {
       this.snackBar.open('Veuillez ajouter un commentaire', 'Fermer', { duration: 3000 });
@@ -84,6 +87,7 @@ export class TreatmentPanelComponent implements OnInit {
     this.showDetailModal = false;
     this.showProcessingModal = false;
     this.selectedClaim = null;
+     this.showRejectionDetailsModal = false;
     this.processingComment = '';
   }
 
