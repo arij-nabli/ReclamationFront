@@ -24,6 +24,7 @@ import { ValidationDecisionComponent } from './validation-decision/validation-de
 import { TreatmentPanelComponent } from './treatment-panel/treatment-panel.component';
 import { ClosureValidationComponent } from './closure-validation/closure-validation.component';
 import { AgentclaimComponent } from './agentclaim/agentclaim.component';
+import { NotificationAgentComponent } from './notification-agent/notification-agent.component';
 
 
 @NgModule({
@@ -34,7 +35,8 @@ import { AgentclaimComponent } from './agentclaim/agentclaim.component';
     ValidationDecisionComponent,
     TreatmentPanelComponent,
     ClosureValidationComponent,
-    AgentclaimComponent
+    AgentclaimComponent,
+    NotificationAgentComponent
   ],
   imports: [
     CommonModule,

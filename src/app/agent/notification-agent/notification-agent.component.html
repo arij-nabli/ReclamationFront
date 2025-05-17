@@ -1,0 +1,25 @@
+<!-- notification-bell.component.html -->
+<div class="notification-bell" (click)="toggleNotifications()">
+  <i class="fas fa-bell"></i>
+  <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+  
+  <div class="notification-dropdown" *ngIf="showNotifications">
+    <div class="notification-header">
+      <h5>Notifications</h5>
+      <button class="btn btn-sm btn-link" (click)="clearAll()">Tout effacer</button>
+    </div>
+    
+    <div class="notification-list">
+      <div *ngFor="let notification of notificationService.notifications$ | async; let i = index" 
+           class="notification-item" [class.unread]="!notification.read"
+           (click)="markAsRead(i)">
+        <div class="notification-message">{{ notification.message }}</div>
+        <div class="notification-time">{{ notification.timestamp | date:'short' }}</div>
+      </div>
+      
+      <div *ngIf="(notificationService.notifications$ | async)?.length === 0" class="no-notifications">
+        Aucune notification
+      </div>
+    </div>
+  </div>
+</div>
