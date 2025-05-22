@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/authservice/auth.service';
 import { ClaimService } from 'src/app/service/claim.service';
 import { interval, Subscription } from 'rxjs';
@@ -24,17 +25,31 @@ export class AgentsidebarComponent implements OnInit, OnDestroy {
   private refreshSubscription!: Subscription;
   private lastCheckTime: Date = new Date();
 
+  agentName: string = '';
+  profileImage: string = 'assets/default-profile.png';
+
   constructor(
     private authService: AuthService,
-    private claimService: ClaimService
+    private claimService: ClaimService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadCounts();
     // Vérifie toutes les 30 secondes
-    this.refreshSubscription = interval(30000).subscribe(() => {
+    this.refreshSubscription = interval(1000).subscribe(() => {
       this.checkNewClaims();
     });
+
+    // Récupérer les informations de l'agent connecté
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.agentName = `${currentUser.firstName} ${currentUser.lastName}`;
+      // Si l'utilisateur a une photo de profil, l'utiliser
+      if (currentUser.profileImage) {
+        this.profileImage = currentUser.profileImage;
+      }
+    }
   }
 
   ngOnDestroy(): void {
@@ -62,5 +77,6 @@ export class AgentsidebarComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.authService.logout();
+    this.router.navigate(['/auth/login']);
   }
 }

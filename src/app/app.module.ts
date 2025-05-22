@@ -8,6 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AdminModule } from './admin/admin.module';
 import { ClaimModule } from './claim/claim.module';
 import { AgentModule } from './agent/agent.module';
+import {  ToastrModule } from 'ngx-toastr';
 
 
 
@@ -20,6 +21,11 @@ import { AgentModule } from './agent/agent.module';
     AgentModule,
     BrowserModule,
     AppRoutingModule,
+    ToastrModule.forRoot({
+      timeOut: 3000,
+      positionClass: 'toast-top-right',
+      preventDuplicates: true,
+    }),
     AuthModule,
     BrowserAnimationsModule,
     AdminModule ,

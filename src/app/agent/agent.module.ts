@@ -25,7 +25,7 @@ import { TreatmentPanelComponent } from './treatment-panel/treatment-panel.compo
 import { ClosureValidationComponent } from './closure-validation/closure-validation.component';
 import { AgentclaimComponent } from './agentclaim/agentclaim.component';
 import { NotificationAgentComponent } from './notification-agent/notification-agent.component';
-
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -43,20 +43,23 @@ import { NotificationAgentComponent } from './notification-agent/notification-ag
     FormsModule,
     AgentRoutingModule,
     AdminModule,
-     MatToolbarModule,
-     MatCardModule,
-     MatTableModule,
-     MatButtonModule,
-     MatIconModule,
-     MatDialogModule,
-     MatFormFieldModule,
-     MatInputModule,
-     MatSelectModule,
-     MatProgressSpinnerModule,
-     MatTabsModule,
-     MatListModule,
-     MatMenuModule
-   
+    RouterModule,
+    MatToolbarModule,
+    MatCardModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatProgressSpinnerModule,
+    MatTabsModule,
+    MatListModule,
+    MatMenuModule
+  ],
+  exports: [
+    NotificationAgentComponent
   ]
 })
 export class AgentModule { }
