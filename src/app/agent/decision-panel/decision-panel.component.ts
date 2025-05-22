@@ -134,9 +134,8 @@ export class DecisionPanelComponent implements OnInit {
     this.claimService.getPendingClaims(this.agentId).subscribe({
       next: (response: any) => {
         this.claims = response.$values || [];
-          this.filteredClaims = [...this.claims];
-        this.calculateTotalPages();
-     
+        this.filteredClaims = [...this.claims];
+         this.calculateTotalPages();
         this.loading = false;
       },
       error: () => {
@@ -145,14 +144,13 @@ export class DecisionPanelComponent implements OnInit {
       }
     });
   }
-  
   get paginatedClaims(): Claim[] {
     const start = this.currentPage * this.pageSize;
     return this.filteredClaims.slice(start, start + this.pageSize);
   }
 
   onPageSizeChange(): void {
-    this.currentPage = 0; // Réinitialiser à la première page
+    this.currentPage = 0; 
     this.calculateTotalPages();
   }
 

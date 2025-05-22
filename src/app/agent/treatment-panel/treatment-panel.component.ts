@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from 'src/app/auth/authservice/auth.service';
+import { Claim } from 'src/app/Models/Claim';
 import { ClaimService } from 'src/app/service/claim.service';
 
 @Component({
@@ -18,6 +19,11 @@ export class TreatmentPanelComponent implements OnInit {
   processingComment = '';
   agentId: any;
   showRejectionDetailsModal = false;
+     pageSize = 5;
+  currentPage = 0;
+  length = 0;
+  totalPages = 0;
+   filteredClaims: any;
   constructor(
     private snackBar: MatSnackBar,
     private claimService: ClaimService,
@@ -34,6 +40,9 @@ export class TreatmentPanelComponent implements OnInit {
     this.claimService.getClaimsToTreat(this.agentId).subscribe({
       next: (response: any) => {
         this.claims = response.$values || [];
+         this.filteredClaims = [...this.claims];
+         this.calculateTotalPages();
+      
         this.loading = false;
       },
       error: () => {
@@ -42,7 +51,39 @@ export class TreatmentPanelComponent implements OnInit {
       }
     });
   }
+  get paginatedClaims(): Claim[] {
+    const start = this.currentPage * this.pageSize;
+    return this.filteredClaims.slice(start, start + this.pageSize);
+  }
 
+  onPageSizeChange(): void {
+    this.currentPage = 0; 
+    this.calculateTotalPages();
+  }
+
+  calculateTotalPages(): void {
+    this.totalPages = Math.ceil(this.filteredClaims.length / this.pageSize);
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+    }
+  }
+
+  goToFirstPage(): void {
+    this.currentPage = 0;
+  }
+
+  goToLastPage(): void {
+    this.currentPage = this.totalPages - 1;
+  }
   openDetailModal(claim: any): void {
     this.selectedClaim = claim;
     this.showDetailModal = true;

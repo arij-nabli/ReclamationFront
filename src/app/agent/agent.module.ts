@@ -26,6 +26,7 @@ import { ClosureValidationComponent } from './closure-validation/closure-validat
 import { AgentclaimComponent } from './agentclaim/agentclaim.component';
 import { NotificationAgentComponent } from './notification-agent/notification-agent.component';
 import { RouterModule } from '@angular/router';
+import { NavbarComponent } from '../admin/navbar/navbar.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { RouterModule } from '@angular/router';
     NotificationAgentComponent
   ],
   imports: [
+  
     CommonModule,
     FormsModule,
     AgentRoutingModule,
@@ -59,6 +61,7 @@ import { RouterModule } from '@angular/router';
     MatMenuModule
   ],
   exports: [
+       NavbarComponent,
     NotificationAgentComponent
   ]
 })

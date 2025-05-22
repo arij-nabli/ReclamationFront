@@ -95,4 +95,27 @@ export class AuthService {
       })
     );
   }
+
+  // Méthode pour demander la réinitialisation du mot de passe
+  forgotPassword(email: string): Observable<any> {
+    return this._httpClient.post(`${environment.baseUrl}/users/forgot-password`, { email }).pipe(
+      catchError((error) => {
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // Méthode pour réinitialiser le mot de passe
+  resetPassword(email: string, token: string, newPassword: string): Observable<any> {
+    return this._httpClient.post(`${environment.baseUrl}/users/reset-password`, {
+      email: email,
+      token: token,
+      newPassword: newPassword
+    }).pipe(
+      catchError((error) => {
+        console.error('Reset password error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
 }

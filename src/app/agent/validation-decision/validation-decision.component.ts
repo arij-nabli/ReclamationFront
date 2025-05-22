@@ -21,7 +21,11 @@ export class ValidationDecisionComponent implements OnInit {
   treatmentResponsibleEmail: string = '';
   selectedResponsible: any = null;
   treatmentResponsibles: any[] = [];
-
+  pageSize = 5;
+  currentPage = 0;
+  length = 0;
+  totalPages = 0;
+   filteredClaims: any;
   constructor(
     private snackBar: MatSnackBar,
     private decisionService: ClaimService,
@@ -34,13 +38,42 @@ export class ValidationDecisionComponent implements OnInit {
     this.loadDecisions();
     this.loadTreatmentResponsibles();
   }
+onPageSizeChange(): void {
+    this.currentPage = 0; 
+    this.calculateTotalPages();
+  }
 
+  calculateTotalPages(): void {
+    this.totalPages = Math.ceil(this.filteredClaims.length / this.pageSize);
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+    }
+  }
+
+  goToFirstPage(): void {
+    this.currentPage = 0;
+  }
+
+  goToLastPage(): void {
+    this.currentPage = this.totalPages - 1;
+  }
   loadDecisions(): void {
     this.loading = true;
     this.decisionService.getClaimsToValidate(this.agentId).subscribe({
       next: (response: any) => {
         this.decisions = response.$values || [];
-        console.log(this.decisions)
+         this.filteredClaims = [...this.decisions];
+         this.calculateTotalPages();
+       
         this.loading = false;
       },
       error: () => {
@@ -49,7 +82,10 @@ export class ValidationDecisionComponent implements OnInit {
       }
     });
   }
-
+  get paginatedClaims(): any[] {
+    const startIndex = this.currentPage * this.pageSize;
+    return this.filteredClaims.slice(startIndex, startIndex + this.pageSize);
+  }
   loadTreatmentResponsibles(): void {
     this.agentService.getAgents().subscribe({
       next: (agents) => {

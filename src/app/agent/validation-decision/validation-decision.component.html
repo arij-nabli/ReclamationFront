@@ -16,31 +16,33 @@
                 <p class="mt-4 text-gray-600">Aucune décision à valider</p>
             </div>
         </div>
-
-        <!-- Tableau des décisions -->
+  <label for="pageSize" class="text-sm font-medium">Éléments par page:</label>
+      <select
+        id="pageSize"
+        [(ngModel)]="pageSize"
+        (change)="onPageSizeChange()"
+        class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+      >
+        <option *ngFor="let size of [5, 10, 25, 100]" [value]="size">{{ size }}</option>
+      </select>
         <div *ngIf="!loading && decisions.length > 0" class="bg-white shadow-md rounded-lg overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Réclamation</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Client</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Décideur</th>
+
+
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Décision</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Date</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr *ngFor="let decision of decisions" class="hover:bg-gray-50">
+                    <tr *ngFor="let decision of paginatedClaims" class="hover:bg-gray-50">
                         <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 max-w-xs truncate sm:px-6">
                             {{ decision.description || '-' }}
                         </td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 sm:px-6">
-                            {{ decision.client?.firstName }} {{ decision.client?.lastName || '-' }}
-                        </td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900 sm:px-6">
-                            {{ decision.decider?.firstName || '-' }} {{ decision.decider?.lastName || '-' }}
-                        </td>
+                        
                         <td class="px-4 py-4 whitespace-nowrap sm:px-6">
                             <span [class]="getDecisionClass(decision.status)" class="px-2 py-1 rounded-full text-xs">
                                 {{ decision.status }}
@@ -59,7 +61,44 @@
                 </tbody>
             </table>
         </div>
-
+<div class="flex items-center justify-between py-4 border-t">
+      <div class="flex items-center space-x-2">
+        <button
+            (click)="goToFirstPage()"
+            [disabled]="currentPage === 0"
+            class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+        >
+            Première
+        </button>
+        <button
+            (click)="previousPage()"
+            [disabled]="currentPage === 0"
+            class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+        >
+            Précédente
+        </button>
+    
+        <span class="text-sm font-medium">
+            Page {{ currentPage + 1 }} sur {{ totalPages }}
+        </span>
+    
+        <button
+            (click)="nextPage()"
+            [disabled]="currentPage >= totalPages - 1"
+            class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+        >
+            Suivante
+        </button>
+    
+        <button
+            (click)="goToLastPage()"
+            [disabled]="currentPage >= totalPages - 1"
+            class="px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+        >
+            Dernière
+        </button>
+      </div>
+    </div>
         <!-- Modal de Validation de Décision -->
         <div *ngIf="showValidationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl mx-4 overflow-hidden max-h-screen overflow-y-auto">
