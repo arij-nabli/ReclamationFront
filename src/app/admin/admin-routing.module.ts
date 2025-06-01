@@ -8,9 +8,11 @@ import { ValidateursClotureComponent } from './components/validateurs-cloture/va
 import { ValidateurDetailsComponent } from './components/validateur-details/validateur-details.component';
 import { SeverityListComponent } from './severity/severity-list/severity-list.component';
 import { ProductListComponent } from './product-list/product-list.component';
+import { UserListComponent } from './user-list/user-list.component';
 
 
 const routes: Routes = [
+   { path: 'utilisateurs', component: UserListComponent },
   { path: 'validateurs-cloture/:id', component: ValidateursClotureComponent },
      { path: 'AdminDashbord', component: DashboardComponent },
         { path: 'claimetype', component: ClaimetypeComponent },

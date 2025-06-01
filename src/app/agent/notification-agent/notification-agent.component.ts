@@ -55,12 +55,48 @@ export class NotificationAgentComponent  implements OnInit, OnDestroy {
     }
   }
 
-  markAsRead(notification: Notification): void {
+   markAsRead(notification: Notification): void {
     if (notification.id && this.userId) {
-      this.notificationService.markAsRead(notification.id);
-      // Mettre à jour localement pour un feedback immédiat
-      notification.isRead = true;
-      this.unreadCount = this.notifications.filter(n => !n.isRead).length;
+      this.notificationService.markAsRead(notification.id).subscribe({
+        next: () => {
+          notification.isRead = true;
+          this.unreadCount = this.notifications.filter(n => !n.isRead).length;
+        },
+        error: (err) => console.error('Error marking as read:', err)
+      });
+    }
+  }
+
+  // Nouvelle méthode pour supprimer une notification
+ // Méthode corrigée pour supprimer une notification
+  deleteNotification(notificationId: number | undefined, event: Event): void {
+    event.stopPropagation(); // Empêche la propagation à markAsRead
+    
+    // Vérifie que l'ID est défini et que l'userId existe
+    if (notificationId != null && this.userId) { 
+      this.notificationService.deleteNotification(notificationId).subscribe({
+        next: () => {
+          // Mise à jour locale après suppression réussie
+          this.notifications = this.notifications.filter(n => n.id !== notificationId);
+          // Recalculer le compteur des non lus
+          this.unreadCount = this.notifications.filter(n => !n.isRead).length;
+        },
+        error: (err) => console.error('Error deleting notification:', err)
+      });
+    } else {
+      console.error('Cannot delete notification: ID is missing or user is not logged in.');
+    }
+  }
+    // Nouvelle méthode pour supprimer toutes les notifications
+  deleteAllNotifications(): void {
+    if (this.userId) {
+      this.notificationService.deleteAllNotifications(this.userId).subscribe({
+        next: () => {
+          this.notifications = [];
+          this.unreadCount = 0;
+        },
+        error: (err) => console.error('Error deleting all notifications:', err)
+      });
     }
   }
 

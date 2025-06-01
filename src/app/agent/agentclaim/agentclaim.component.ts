@@ -106,11 +106,28 @@ export class AgentclaimComponent implements OnInit {
       case 'TreatmentByDecider':
       case 'TreatmentByTreatmentResponsible': return 'bg-blue-100 text-blue-800';
       case 'DecisionValidated': return 'bg-green-100 text-green-800';
+       case 'Closed': return 'bg-green-600 text-green-100';
       case 'DecisionRejected': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   }
-
+translateStatus(status: string): string {
+  switch (status) {
+     case 'Pending':
+      return 'En attente';
+    case 'TreatmentByDecider':
+      return 'Traitement par le décideur';
+    case 'DecisionValidated':
+      return 'Décision validée';
+    case 'Closed':
+      return 'Fermée';
+    case 'Rejected':
+      return 'Rejetée';
+    // Ajoute les autres statuts selon ta logique métier
+    default:
+      return status; // Affiche la valeur brute si aucune traduction trouvée
+  }
+}
   getStatusLabel(status: string): string {
     const statusLabels: {[key: string]: string} = {
       'Pending': 'En attente',

@@ -29,6 +29,7 @@ import { ValidateursClotureComponent } from './components/validateurs-cloture/va
 import { SeverityListComponent } from './severity/severity-list/severity-list.component';
 import { ProductListComponent } from './product-list/product-list.component';
 import { MatSnackBarModule  } from '@angular/material/snack-bar';
+import { UserListComponent } from './user-list/user-list.component';
 
 
 @NgModule({
@@ -43,7 +44,8 @@ import { MatSnackBarModule  } from '@angular/material/snack-bar';
     ValidateurDetailsComponent,
     ValidateursClotureComponent,
     SeverityListComponent,
-    ProductListComponent
+    ProductListComponent,
+    UserListComponent
   ],
   imports: [
     CommonModule,

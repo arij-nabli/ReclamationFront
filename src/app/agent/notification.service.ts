@@ -24,7 +24,20 @@ export class NotificationService {
   private unreadCountSubject = new BehaviorSubject<number>(0);
   public unreadCount$ = this.unreadCountSubject.asObservable();
   private refreshInterval: any;
-  
+// Dans NotificationService
+// Compteur "À valider" non lu
+private unreadToValidateCountSubject = new BehaviorSubject<number>(0);
+public unreadToValidateCount$: Observable<number> = this.unreadToValidateCountSubject.asObservable();
+ // *** NOUVEAU: Compteur "À décider" non lu ***
+  private unreadToDecideCountSubject = new BehaviorSubject<number>(0);
+  public unreadToDecideCount$: Observable<number> = this.unreadToDecideCountSubject.asObservable();
+
+  // *** NOUVEAU: Compteur "À clôturer" non lu ***
+  private unreadToCloseCountSubject = new BehaviorSubject<number>(0);
+  public unreadToCloseCount$: Observable<number> = this.unreadToCloseCountSubject.asObservable();
+// Compteur "En traitement" non lu
+private unreadInTreatmentCountSubject = new BehaviorSubject<number>(0);
+public unreadInTreatmentCount$: Observable<number> = this.unreadInTreatmentCountSubject.asObservable();
   // URL de base de l'API
   private apiUrl = `${environment.baseUrl}/notifications`;
   
@@ -51,6 +64,7 @@ export class NotificationService {
         const userId = this.auth.getUserId();
         if (userId) {
           this.loadNotifications(userId);
+          
         }
         
         // Mettre en place un rechargement périodique comme solution de secours
@@ -86,7 +100,7 @@ export class NotificationService {
       if (userId) {
         this.loadNotifications(userId);
       }
-    }, 5000);
+    }, 3000);
   }
   
   // Ajouter l'écouteur pour les notifications
@@ -141,6 +155,26 @@ private processNotification(data: any) {
   }
 }
   
+private updateAllCounts(notifications: Notification[]): void {
+    // Compteur total non lu
+    const totalUnreadCount = notifications.filter(n => !n.isRead).length;
+    this.unreadCountSubject.next(totalUnreadCount);
+
+    // Compteurs spécifiques
+    const unreadToDecideCount = notifications.filter(n => !n.isRead && n.type === 'Nouvellle Reclamation').length;
+    this.unreadToDecideCountSubject.next(unreadToDecideCount);
+
+    const unreadToValidateCount = notifications.filter(n => !n.isRead && n.type === 'Reclamation A decider').length;
+    this.unreadToValidateCountSubject.next(unreadToValidateCount);
+
+    const unreadInTreatmentCount = notifications.filter(n => !n.isRead && n.type === 'Claimvalidated').length;
+    this.unreadInTreatmentCountSubject.next(unreadInTreatmentCount);
+
+    const unreadToCloseCount = notifications.filter(n => !n.isRead && n.type === 'ClaimValidated').length;
+    this.unreadToCloseCountSubject.next(unreadToCloseCount);
+
+   
+}
   // Charger les notifications depuis l'API
   public loadNotifications(userId: string): void {
     if (!userId) return;
@@ -163,7 +197,8 @@ private processNotification(data: any) {
           
           console.log('Notifications normalisées:', normalizedNotifications);
           this.notificationsSubject.next(normalizedNotifications);
-          this.updateUnreadCount();
+          this.notificationsSubject.next(normalizedNotifications);
+          this.updateAllCounts(normalizedNotifications);
         },
         error: (error) => {
           console.error('Error loading notifications:', error);
@@ -249,24 +284,16 @@ private processNotification(data: any) {
   }
   
   // Supprimer une notification
-  public deleteNotification(notificationId: number): Observable<any> {
-    const result = this.http.delete(`${this.apiUrl}/${notificationId}`);
+  public deleteNotification(notificationId: any): Observable<any> {
+  return this.http.delete(`${this.apiUrl}/${notificationId}`);
     
-    result.subscribe({
-      next: () => {
-        const currentNotifications = this.notificationsSubject.value;
-        const updatedNotifications = currentNotifications.filter(n => n.id !== notificationId);
-        this.notificationsSubject.next(updatedNotifications);
-        this.updateUnreadCount();
-      },
-      error: (error) => {
-        console.error('Erreur lors de la suppression de la notification:', error);
-      }
-    });
     
-    return result;
+  
+    
+   
   }
   
+ 
   // Supprimer toutes les notifications d'un utilisateur
   public deleteAllNotifications(userId: string): Observable<any> {
     const result = this.http.delete(`${this.apiUrl}/user/${userId}`);

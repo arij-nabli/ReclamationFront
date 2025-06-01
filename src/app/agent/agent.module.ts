@@ -27,6 +27,7 @@ import { AgentclaimComponent } from './agentclaim/agentclaim.component';
 import { NotificationAgentComponent } from './notification-agent/notification-agent.component';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from '../admin/navbar/navbar.component';
+import { NavAgentComponent } from './nav-agent/nav-agent.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { NavbarComponent } from '../admin/navbar/navbar.component';
     TreatmentPanelComponent,
     ClosureValidationComponent,
     AgentclaimComponent,
-    NotificationAgentComponent
+    NotificationAgentComponent,
+    NavAgentComponent
   ],
   imports: [
   

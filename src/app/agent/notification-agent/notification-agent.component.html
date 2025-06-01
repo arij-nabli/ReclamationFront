@@ -1,22 +1,26 @@
 <div class="relative">
   <!-- Bouton de notification -->
-  <button (click)="toggleNotifications()" class="relative p-2 text-gray-600 hover:text-blue-600 focus:outline-none">
-    <!-- Icône de cloche -->
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+  <button (click)="toggleNotifications()" class="p-1 rounded-full text-white hover:bg-blue-700 relative focus:outline-none">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
     </svg>
-    
-    <!-- Badge de notifications non lues -->
     <span *ngIf="unreadCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
       {{unreadCount}}
     </span>
   </button>
 
-  <!-- Panneau des notifications - Version responsive -->
-  <div *ngIf="showNotifications" class="fixed lg:absolute inset-0 lg:inset-auto lg:right-0 lg:mt-2 lg:w-80 w-full bg-white rounded-md shadow-lg z-50 lg:z-auto">
-    <!-- En-tête avec bouton de fermeture (visible sur mobile) -->
+  <!-- Panneau des notifications -->
+  <div *ngIf="showNotifications" class="fixed lg:absolute inset-0 lg:inset-auto lg:right-0 lg:mt-2 lg:w-96 w-full bg-white rounded-md shadow-lg z-50 lg:z-auto">
+    <!-- En-tête -->
     <div class="p-4 border-b flex justify-between items-center">
-      <h3 class="text-lg font-medium">Notifications</h3>
+      <div class="flex items-center">
+        <h3 class="text-lg font-medium">Notifications</h3>
+        <button *ngIf="notifications.length > 0" 
+                (click)="deleteAllNotifications()" 
+                class="ml-2 text-xs text-red-500 hover:text-red-700">
+          Tout supprimer
+        </button>
+      </div>
       <button (click)="toggleNotifications()" class="lg:hidden p-1 text-gray-500 hover:text-gray-700">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -32,18 +36,29 @@
       
       <div *ngFor="let notification of notifications" 
            (click)="markAsRead(notification)"
-           class="p-4 border-b hover:bg-gray-50 cursor-pointer"
+           class="p-4 border-b hover:bg-gray-50 cursor-pointer group relative"
            [class.bg-blue-50]="!notification.isRead">
         
-        <div class="flex items-start">
-          <!-- Icône selon le type -->
+        <!-- Bouton de suppression -->
+        <button (click)="deleteNotification(notification.id, $event)"
+                class="absolute right-2 top-2 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
+        
+        <div class="flex items-start pr-5">
+          <!-- Icône -->
           <div [ngClass]="{
                 'text-blue-500': notification.type === 'Info',
                 'text-green-500': notification.type === 'Success',
                 'text-yellow-500': notification.type === 'Warning',
                 'text-red-500': notification.type === 'Error',
-                'text-purple-500': notification.type === 'NewClaim'
-              }" class="mr-3">
+                'text-purple-500': notification.type === 'NewClaim',
+                'text-green-600': notification.type === 'ClaimValidated',
+                'text-blue-600': notification.type === 'ClôtureAcceptée',
+                'text-red-600': notification.type === 'ClôtureRefusée'
+              }" class="mr-3 text-lg">
             {{ getNotificationIcon(notification.type) }}
           </div>
           

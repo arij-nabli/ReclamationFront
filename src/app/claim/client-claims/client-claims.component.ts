@@ -64,7 +64,23 @@ export class ClientClaimsComponent implements OnInit {
     const start = this.currentPage * this.pageSize;
     return this.filteredClaims.slice(start, start + this.pageSize);
   }
-
+translateStatus(status: string): string {
+  switch (status) {
+     case 'Pending':
+      return 'En attente';
+    case 'TreatmentByDecider':
+      return 'Traitement par le décideur';
+    case 'DecisionValidated':
+      return 'Décision validée';
+    case 'Closed':
+      return 'Fermée';
+    case 'Rejected':
+      return 'Rejetée';
+    // Ajoute les autres statuts selon ta logique métier
+    default:
+      return status; // Affiche la valeur brute si aucune traduction trouvée
+  }
+}
   onPageChange(event: any): void {
     this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;

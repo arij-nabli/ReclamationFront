@@ -1,0 +1,411 @@
+<div class="flex flex-col h-screen" style="background-color: #EBF3FE;">
+    <app-navbar></app-navbar>
+    <div class="flex flex-1 overflow-hidden">
+      <app-sidebar></app-sidebar>
+      <main class="flex-1 overflow-auto p-4 sm:p-6"> <!-- Adjusted padding back to original -->
+        <!-- Optional: If sm:ml-64 is needed for layout with sidebar, keep this div -->
+        <!-- <div class="p-4 sm:ml-64 flex flex-col h-full"> -->
+
+          <!-- Wrapper for content centering on large screens -->
+          <div class="w-full lg:max-w-7xl lg:mx-auto">
+
+            <!-- Header: Title and Add Button -->
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
+              <h2 class="text-xl sm:text-2xl font-bold text-center sm:text-left">
+                Gestion des Utilisateurs
+              </h2>
+              <button
+                *ngIf="!showEditForm"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-md flex items-center justify-center sm:justify-start"
+                style="background-color: #2A62FE"
+                (click)="showAddForm = true">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Ajouter
+              </button>
+            </div>
+
+            <!-- Filtres -->
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+              <div class="relative flex-grow">
+                <input
+                  type="text"
+                  [(ngModel)]="searchTerm"
+                  (ngModelChange)="filterUsers()"
+                  placeholder="Rechercher..."
+                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute right-3 top-2.5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <div class="flex items-center gap-2">
+                  <label for="roleFilter" class="text-sm font-medium whitespace-nowrap">Rôle:</label>
+                  <select
+                    id="roleFilter"
+                    [(ngModel)]="selectedRole"
+                    (ngModelChange)="filterUsers()"
+                    class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
+                  >
+                    <option value="all">Tous</option>
+                    <option value="Agent">Agent</option>
+                    <option value="Client">Client</option>
+                  </select>
+                </div>
+                <div class="flex items-center gap-2">
+                  <label for="pageSize" class="text-sm font-medium whitespace-nowrap">Par page:</label>
+                  <select
+                    id="pageSize"
+                    [(ngModel)]="pageSize"
+                    (change)="onPageSizeChange()"
+                    class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
+                  >
+                    <option *ngFor="let size of [5, 10, 25, 100]" [value]="size">{{ size }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tableau des utilisateurs -->
+            <div class="overflow-x-auto bg-white rounded-lg shadow-sm">
+              <table class="min-w-full">
+                <thead>
+                  <tr class="bg-[#B1CEFB] text-left">
+                    
+                    <th class="py-3 px-3 sm:px-4 border-b font-semibold">Email</th>
+                    <th class="py-3 px-3 sm:px-4 border-b font-semibold hidden sm:table-cell">Nom complet</th>
+                    <th class="py-3 px-3 sm:px-4 border-b font-semibold">Rôle</th>
+                    <th class="py-3 px-3 sm:px-4 border-b font-semibold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let user of users" class="hover:bg-gray-50 border-b">
+               
+                    <td class="py-3 px-3 sm:px-4">{{ user.email }}</td>
+                    <td class="py-3 px-3 sm:px-4 hidden sm:table-cell">{{ user.firstName }} {{ user.lastName }}</td>
+                    <td class="py-3 px-3 sm:px-4">
+                      <span [ngClass]="{
+                        'bg-blue-100 text-blue-800': user.role === 'Agent',
+                        'bg-green-100 text-green-800': user.role === 'Client'
+                      }" class="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+                        {{ user.role }}
+                      </span>
+                    </td>
+                    <td class="py-3 px-3 sm:px-4">
+                      <div class="flex justify-end sm:justify-start">
+                        <!-- Version desktop (icônes visibles) -->
+                        <div class="hidden sm:flex space-x-2">
+                          <button class="text-[#316879] hover:text-[#053075]" (click)="editUser(user)" title="Modifier">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                            </svg>
+                          </button>
+                          <button class="text-red-500 hover:text-red-700" (click)="confirmDelete(user)" title="Supprimer">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                          </button>
+                        </div>
+                        <!-- Version mobile (menu trois points) -->
+                        <div class="sm:hidden relative">
+                          <button class="text-gray-500 hover:text-[#053075]" (click)="toggleActionMenu(user.id)">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"/>
+                            </svg>
+                          </button>
+                          <!-- Menu déroulant actions -->
+                          <div *ngIf="actionMenuOpen === user.id" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
+                            <div class="py-1">
+                              <button (click)="editUser(user)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <span class="flex items-center">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-[#316879]" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                  </svg>
+                                  Modifier
+                                </span>
+                              </button>
+                              <button (click)="confirmDelete(user)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <span class="flex items-center">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                  </svg>
+                                  Supprimer
+                                </span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="filteredUsers.length === 0">
+                    <td colspan="5" class="py-3 px-4 text-center text-gray-500">
+                      Aucun utilisateur trouvé
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div> <!-- End of table div -->
+
+            <!-- Pagination -->
+            <div class="flex flex-col sm:flex-row items-center justify-between py-4 gap-3">
+               <div class="text-sm text-gray-600 whitespace-nowrap">
+                  <!-- Corrected pagination display logic if possible, otherwise keep original -->
+                  Affichage de {{ (currentPage * pageSize) + 1 }} à {{ (currentPage * pageSize) + users.length }} sur {{ filteredUsers.length }} utilisateurs
+                </div>
+                <div class="flex items-center gap-1 sm:gap-2 flex-wrap justify-center">
+                  <button
+                    (click)="goToFirstPage()"
+                    [disabled]="currentPage === 0"
+                    class="px-2 sm:px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 text-sm"
+                  >
+                    Première
+                  </button>
+                  <button
+                    (click)="previousPage()"
+                    [disabled]="currentPage === 0"
+                    class="px-2 sm:px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 text-sm"
+                  >
+                    Précédente
+                  </button>
+                  <span class="text-sm font-medium whitespace-nowrap">
+                    Page {{ currentPage + 1 }} sur {{ totalPages }}
+                  </span>
+                  <button
+                    (click)="nextPage()"
+                    [disabled]="currentPage >= totalPages - 1"
+                    class="px-2 sm:px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 text-sm"
+                  >
+                    Suivante
+                  </button>
+                  <button
+                    (click)="goToLastPage()"
+                    [disabled]="currentPage >= totalPages - 1"
+                    class="px-2 sm:px-3 py-1 border rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50 text-sm"
+                  >
+                    Dernière
+                  </button>
+                </div>
+            </div> <!-- End of pagination div -->
+
+          </div> <!-- End of centering wrapper -->
+
+        <!-- Optional: Close the sm:ml-64 div if used -->
+        <!-- </div> -->
+
+        <!-- Modals: Placed here to ensure they are on top and cover the screen -->
+        <!-- Formulaire d'ajout -->
+        <div *ngIf="showAddForm" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 m-4 max-w-md w-full">
+             <!-- Add form content here based on previous file reads -->
+             <h3 class="text-lg font-semibold mb-4">Ajouter un utilisateur</h3>
+             <form [formGroup]="addUserForm" (ngSubmit)="addUser()" class="space-y-4">
+                <!-- Form fields... -->
+             </form>
+          </div>
+        </div>
+
+        <!-- Modal de confirmation de suppression -->
+        <div *ngIf="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+            <!-- Add confirmation content here -->
+             <h3 class="text-lg font-semibold mb-4">Confirmer la suppression</h3>
+             <p class="mb-4">Êtes-vous sûr de vouloir supprimer l'utilisateur "{{ userToDelete?.username }}" ?</p>
+             <div class="flex justify-end space-x-3 sm:space-x-4">
+                <!-- Buttons... -->
+             </div>
+          </div>
+        </div>
+
+        <!-- Modal d'édition -->
+        <div *ngIf="showEditForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+            <!-- Add edit form content here -->
+            <h3 class="text-lg font-semibold mb-4">Modifier l'utilisateur</h3>
+            <form [formGroup]="editUserForm" (ngSubmit)="updateUser()" class="space-y-4">
+                <!-- Form fields... -->
+            </form>
+          </div>
+        </div>
+
+      </main>
+    </div> <!-- End of flex flex-1 -->
+</div> <!-- End of root flex div -->
+   
+   
+
+
+  <!-- Formulaire d'ajout -->
+  <div *ngIf="showAddForm" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 m-4 max-w-md w-full">
+      <h3 class="text-lg font-semibold mb-4">Ajouter un utilisateur</h3>
+      <form [formGroup]="addUserForm" (ngSubmit)="addUser()" class="space-y-4">
+        <div>
+          <label for="username" class="block text-gray-700 font-medium mb-2">Nom d'utilisateur</label>
+          <input type="text" id="username" formControlName="username"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+          <div *ngIf="addUserForm.get('username')?.touched && addUserForm.get('username')?.invalid" class="text-red-500 text-sm mt-1">
+            Le nom d'utilisateur est requis.
+          </div>
+        </div>
+    
+        <div>
+          <label for="email" class="block text-gray-700 font-medium mb-2">Email</label>
+          <input type="email" id="email" formControlName="email"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+          <div *ngIf="addUserForm.get('email')?.touched && addUserForm.get('email')?.invalid" class="text-red-500 text-sm mt-1">
+            <div *ngIf="addUserForm.get('email')?.errors?.['required']">
+              L'email est requis.
+            </div>
+            <div *ngIf="addUserForm.get('email')?.errors?.['email']">
+              Veuillez entrer un email valide.
+            </div>
+          </div>
+        </div>
+    
+        <div>
+          <label for="firstName" class="block text-gray-700 font-medium mb-2">Prénom</label>
+          <input type="text" id="firstName" formControlName="firstName"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+          <div *ngIf="addUserForm.get('firstName')?.touched && addUserForm.get('firstName')?.invalid" class="text-red-500 text-sm mt-1">
+            Le prénom est requis.
+          </div>
+        </div>
+    
+        <div>
+          <label for="lastName" class="block text-gray-700 font-medium mb-2">Nom</label>
+          <input type="text" id="lastName" formControlName="lastName"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+          <div *ngIf="addUserForm.get('lastName')?.touched && addUserForm.get('lastName')?.invalid" class="text-red-500 text-sm mt-1">
+            Le nom est requis.
+          </div>
+        </div>
+    
+        <div>
+          <label for="role" class="block text-gray-700 font-medium mb-2">Rôle</label>
+          <select id="role" formControlName="role"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+            <option value="">Sélectionner un rôle</option>
+            <option value="Agent">Agent</option>
+            <option value="Client">Client</option>
+          </select>
+          <div *ngIf="addUserForm.get('role')?.touched && addUserForm.get('role')?.invalid" class="text-red-500 text-sm mt-1">
+            Le rôle est requis.
+          </div>
+        </div>
+    
+        <div>
+          <label for="password" class="block text-gray-700 font-medium mb-2">Mot de passe (optionnel)</label>
+          <input type="password" id="password" formControlName="password"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+          <div class="text-xs text-gray-500 mt-1">Si vide, un mot de passe aléatoire sera généré</div>
+        </div>
+    
+        <div class="flex justify-end space-x-3 sm:space-x-4">
+          <button type="button" (click)="cancelAdd()" 
+            class="px-3 sm:px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 text-sm sm:text-base">
+            Annuler
+          </button>
+          <button type="submit" [disabled]="addUserForm.invalid"
+            class="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:text-base">
+            Enregistrer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de confirmation de suppression -->
+  <div *ngIf="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+      <h3 class="text-lg font-semibold mb-4">Confirmer la suppression</h3>
+      <p class="mb-4">Êtes-vous sûr de vouloir supprimer l'utilisateur "{{ userToDelete?.username }}" ?</p>
+      <div class="flex justify-end space-x-3 sm:space-x-4">
+        <button 
+          class="px-3 sm:px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 text-sm sm:text-base"
+          (click)="showDeleteModal = false">
+          Annuler
+        </button>
+        <button 
+          class="px-3 sm:px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm sm:text-base"
+          (click)="deleteUser()">
+          Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal d'édition -->
+  <div *ngIf="showEditForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+      <h3 class="text-lg font-semibold mb-4">Modifier l'utilisateur</h3>
+      
+      <form [formGroup]="editUserForm" (ngSubmit)="updateUser()" class="space-y-4">
+        <div>
+          <label for="edit-username" class="block text-gray-700 font-medium mb-2">Nom d'utilisateur</label>
+          <input type="text" id="edit-username" formControlName="username"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+          <div *ngIf="editUserForm.get('username')?.touched && editUserForm.get('username')?.invalid" class="text-red-500 text-sm mt-1">
+            Le nom d'utilisateur est requis.
+          </div>
+        </div>
+    
+        <div>
+          <label for="edit-email" class="block text-gray-700 font-medium mb-2">Email</label>
+          <input type="email" id="edit-email" formControlName="email"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+          <div *ngIf="editUserForm.get('email')?.touched && editUserForm.get('email')?.invalid" class="text-red-500 text-sm mt-1">
+            <div *ngIf="editUserForm.get('email')?.errors?.['required']">
+              L'email est requis.
+            </div>
+            <div *ngIf="editUserForm.get('email')?.errors?.['email']">
+              Veuillez entrer un email valide.
+            </div>
+          </div>
+        </div>
+    
+        <div>
+          <label for="edit-firstName" class="block text-gray-700 font-medium mb-2">Prénom</label>
+          <input type="text" id="edit-firstName" formControlName="firstName"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+          <div *ngIf="editUserForm.get('firstName')?.touched && editUserForm.get('firstName')?.invalid" class="text-red-500 text-sm mt-1">
+            Le prénom est requis.
+          </div>
+        </div>
+    
+        <div>
+          <label for="edit-lastName" class="block text-gray-700 font-medium mb-2">Nom</label>
+          <input type="text" id="edit-lastName" formControlName="lastName"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+          <div *ngIf="editUserForm.get('lastName')?.touched && editUserForm.get('lastName')?.invalid" class="text-red-500 text-sm mt-1">
+            Le nom est requis.
+          </div>
+        </div>
+    
+        <div>
+          <label for="edit-role" class="block text-gray-700 font-medium mb-2">Rôle</label>
+          <select id="edit-role" formControlName="role"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+            <option value="Agent">Agent</option>
+            <option value="Client">Client</option>
+          </select>
+          <div *ngIf="editUserForm.get('role')?.touched && editUserForm.get('role')?.invalid" class="text-red-500 text-sm mt-1">
+            Le rôle est requis.
+          </div>
+        </div>
+    
+        <div class="flex justify-end space-x-3 sm:space-x-4">
+          <button type="button" (click)="cancelEdit()" 
+            class="px-3 sm:px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 text-sm sm:text-base">
+            Annuler
+          </button>
+          <button type="submit" [disabled]="editUserForm.invalid"
+            class="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:text-base">
+            Enregistrer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>

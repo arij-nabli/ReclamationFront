@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/authservice/auth.service';
 import { ClaimService } from 'src/app/service/claim.service';
-import { interval, Subscription } from 'rxjs';
+import { interval, Observable, Subscription } from 'rxjs';
+import { NotificationService } from '../notification.service';
 
 @Component({
   selector: 'app-agentsidebar',
@@ -24,15 +25,28 @@ export class AgentsidebarComponent implements OnInit, OnDestroy {
 
   private refreshSubscription!: Subscription;
   private lastCheckTime: Date = new Date();
-
+   unreadToDecideCount$: Observable<number>;
+  unreadToValidateCount$: Observable<number>;
+  unreadInTreatmentCount$: Observable<number>;
+  unreadToCloseCount$: Observable<number>;
   agentName: string = '';
   profileImage: string = 'assets/default-profile.png';
 
   constructor(
     private authService: AuthService,
     private claimService: ClaimService,
+    private notificationService:NotificationService,
     private router: Router
-  ) {}
+  ) {
+
+ // Initialisation des observables
+    this.unreadToDecideCount$ = this.notificationService.unreadToDecideCount$;
+    this.unreadToCloseCount$ = this.notificationService.unreadToCloseCount$;
+    
+   
+     this.unreadToValidateCount$ = this.notificationService.unreadToValidateCount$;
+     this.unreadInTreatmentCount$ = this.notificationService.unreadInTreatmentCount$;
+  }
 
   ngOnInit(): void {
     this.loadCounts();
