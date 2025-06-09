@@ -217,6 +217,11 @@ translateStatus(status: string): string {
       return status; // Affiche la valeur brute si aucune traduction trouvée
   }
 }
+
+getProducts(claim: any): any[] {
+  // Handle both possible structures: claim.products.$values or claim.products directly
+  return claim.products?.$values || claim.products || [];
+}
   // Modifié pour retourner string, ou ajuster l'appelant si severity est un objet
   getSeverityLabel(severity: any): string {
     // Si severity est un objet avec une propriété 'level' ou 'id'

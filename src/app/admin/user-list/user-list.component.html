@@ -296,12 +296,7 @@
           </div>
         </div>
     
-        <div>
-          <label for="password" class="block text-gray-700 font-medium mb-2">Mot de passe (optionnel)</label>
-          <input type="password" id="password" formControlName="password"
-            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
-          <div class="text-xs text-gray-500 mt-1">Si vide, un mot de passe aléatoire sera généré</div>
-        </div>
+       
     
         <div class="flex justify-end space-x-3 sm:space-x-4">
           <button type="button" (click)="cancelAdd()" 
@@ -344,10 +339,10 @@
       
       <form [formGroup]="editUserForm" (ngSubmit)="updateUser()" class="space-y-4">
         <div>
-          <label for="edit-username" class="block text-gray-700 font-medium mb-2">Nom d'utilisateur</label>
-          <input type="text" id="edit-username" formControlName="username"
+          <label for="edit-userName" class="block text-gray-700 font-medium mb-2">Nom d'utilisateur</label>
+          <input type="text" id="edit-userName" formControlName="username"
             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
-          <div *ngIf="editUserForm.get('username')?.touched && editUserForm.get('username')?.invalid" class="text-red-500 text-sm mt-1">
+          <div *ngIf="editUserForm.get('userName')?.touched && editUserForm.get('userName')?.invalid" class="text-red-500 text-sm mt-1">
             Le nom d'utilisateur est requis.
           </div>
         </div>

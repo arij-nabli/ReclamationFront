@@ -150,13 +150,29 @@
               <h3 class="font-semibold text-gray-700 mb-2">Client</h3>
               <p>{{selectedClaim?.client?.firstName}} {{selectedClaim?.client?.lastName}}</p>
               <p>{{selectedClaim?.client?.email}}</p>
-              <p>{{selectedClaim?.client?.phoneNumber || '-'}}</p>
+
             </div>
             <div class="bg-gray-50 p-4 rounded-lg">
               <h3 class="font-semibold text-gray-700 mb-2">Type de réclamation</h3>
               <p>{{selectedClaim?.claimType?.name || '-'}}</p>
               <p class="text-sm text-gray-500 mt-1">{{selectedClaim?.claimType?.description || '-'}}</p>
             </div>
+             <div class="mt-4">
+      <h4 class="font-bold mb-2">Produits concernés</h4>
+      <div *ngIf="getProducts(selectedClaim).length > 0; else noProductsInModal">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div *ngFor="let product of getProducts(selectedClaim)" 
+               class="border rounded p-3 hover:bg-gray-50">
+            <p class="font-medium">{{ product.productName }}</p>
+            <p class="text-sm text-gray-600">Code: {{ product.productCode }}</p>
+           
+          </div>
+        </div>
+      </div>
+      <ng-template #noProductsInModal>
+        <p class="text-gray-400 italic">Aucun produit associé à cette réclamation</p>
+      </ng-template>
+    </div>
           </div>
         </div>
         <div class="mt-6 flex justify-end">

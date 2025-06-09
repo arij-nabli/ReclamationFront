@@ -1,5 +1,6 @@
-import { Component , OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, FormArray, FormControl } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { ClaimtypesService } from 'src/app/admin/adminservice/claimtypesservice/claimtypes.service';
 import { ProductService } from 'src/app/admin/adminservice/Productservice/product.service';
@@ -11,7 +12,7 @@ import { ClaimType } from 'src/app/Models/ClaimType';
 import { Product } from 'src/app/Models/Product';
 import { Severity } from 'src/app/Models/Severity';
 import { ClaimService } from 'src/app/service/claim.service';
-import { FormArray } from '@angular/forms';
+
 @Component({
   selector: 'app-add-claim',
   templateUrl: './add-claim.component.html',
@@ -26,8 +27,12 @@ export class AddClaimComponent implements OnInit {
   isLoading = false;
   successMessage = '';
   errorMessage = '';
-  clientId: any | null = null;
+  clientId: string | null = null;
   showModal = false;
+  
+  // Nouvelles propriétés pour le multi-select dropdown
+  showProductDropdown = false;
+  productSearchTerm = '';
 
   constructor(
     private router: Router,
@@ -42,7 +47,7 @@ export class AddClaimComponent implements OnInit {
       title: ['', [Validators.required, Validators.maxLength(100)]],
       description: ['', [Validators.required, Validators.maxLength(500)]],
       claimTypeId: ['', Validators.required],
-      productId: ['', Validators.required],
+      productIds: this.fb.array([], Validators.required),
       severityId: ['', Validators.required],
       customFields: this.fb.array([])
     });
@@ -50,23 +55,125 @@ export class AddClaimComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeData();
+    
+    // Fermer le dropdown quand on clique ailleurs sur la page
+    document.addEventListener('click', (event: MouseEvent) => {
+      if (this.showProductDropdown && !(event.target as HTMLElement).closest('.relative')) {
+        this.showProductDropdown = false;
+      }
+    });
   }
 
   get customFields(): FormArray {
     return this.claimForm.get('customFields') as FormArray;
   }
+
+  get productIds(): FormArray {
+    return this.claimForm.get('productIds') as FormArray;
+  }
   
+  // Getter pour filtrer les produits selon le terme de recherche
+  get filteredProducts(): Product[] {
+    if (!this.productSearchTerm) {
+      return this.products;
+    }
+    
+    const searchTerm = this.productSearchTerm.toLowerCase();
+    return this.products.filter(product => 
+      product.productName!.toLowerCase().includes(searchTerm) || 
+      product.productCode!.toLowerCase().includes(searchTerm)
+    );
+  }
+
   addCustomField(): void {
     this.customFields.push(this.fb.group({
       key: ['', Validators.required],
       value: ['']
     }));
   }
-  
+
   removeCustomField(index: number): void {
     this.customFields.removeAt(index);
   }
   
+  // Méthode pour basculer l'affichage du dropdown
+  toggleProductDropdown(): void {
+    this.showProductDropdown = !this.showProductDropdown;
+    if (this.showProductDropdown) {
+      this.productSearchTerm = '';
+    }
+  }
+  
+  // Méthode pour sélectionner/désélectionner un produit
+  toggleProduct(productId: string): void {
+    if (this.isProductSelected(productId)) {
+      this.removeProduct(new Event('click'), productId);
+    } else {
+      const productIdsArray = this.productIds;
+      productIdsArray.push(new FormControl(productId));
+    }
+  }
+  
+  // Méthode pour sélectionner/désélectionner tous les produits
+  toggleAllProducts(): void {
+    if (this.isAllProductsSelected()) {
+      // Désélectionner tous les produits
+      while (this.productIds.length !== 0) {
+        this.productIds.removeAt(0);
+      }
+    } else {
+      // Sélectionner tous les produits
+      const productIdsArray = this.productIds;
+      // Vider d'abord le tableau pour éviter les doublons
+      while (productIdsArray.length !== 0) {
+        productIdsArray.removeAt(0);
+      }
+      // Ajouter tous les produits
+      this.products.forEach(product => {
+        productIdsArray.push(new FormControl(product.id));
+      });
+    }
+  }
+  
+  // Vérifier si tous les produits sont sélectionnés
+  isAllProductsSelected(): boolean {
+    return this.products.length > 0 && this.productIds.length === this.products.length;
+  }
+  
+  // Supprimer un produit sélectionné (utilisé pour les tags)
+  removeProduct(event: Event, productId: string): void {
+    event.stopPropagation();
+    const index = this.productIds.controls.findIndex(x => x.value === productId);
+    if (index >= 0) {
+      this.productIds.removeAt(index);
+    }
+  }
+  
+  // Obtenir le nom d'un produit à partir de son ID
+  getProductName(productId: string): string {
+    const product = this.products.find(p => p.id === productId);
+    return product ? `${product.productName} (${product.productCode})` : productId;
+  }
+
+  onProductChange(event: Event, productId: string): void {
+    const target = event.target as HTMLInputElement;
+    const isChecked = target.checked;
+    const productIdsArray = this.productIds;
+
+    if (isChecked) {
+      productIdsArray.push(new FormControl(productId));
+    } else {
+      const index = productIdsArray.controls.findIndex(x => x.value === productId);
+      if (index >= 0) {
+        productIdsArray.removeAt(index);
+      }
+    }
+  }
+
+  isProductSelected(productId: string): boolean {
+    return this.productIds.value.includes(productId);
+  }
+
   openModal(): void {
     this.showModal = true;
     document.body.style.overflow = 'hidden';
@@ -98,7 +205,6 @@ export class AddClaimComponent implements OnInit {
   }
 
   loadDropdownData(): void {
-    // Charger les types de réclamation
     this.claimTypeService.getClaimTypes().subscribe({
       next: (response: any) => {
         this.claimTypes = response.$values || [];
@@ -109,11 +215,11 @@ export class AddClaimComponent implements OnInit {
     this.productService.getAllProducts().subscribe({
       next: (response: any) => {
         this.products = response.$values || [];
+   
       },
       error: (error) => this.handleError(error, 'products')
     });
   
-    // Charger les niveaux de gravité
     this.severityService.getAllSeverities().subscribe({
       next: (response: any) => {
         this.severities = response.$values || [];
@@ -150,10 +256,11 @@ export class AddClaimComponent implements OnInit {
     }
     
     const claimData = {
+      title:formValue.title,
       description: formValue.description,
       claimTypeId: formValue.claimTypeId,
       severityId: formValue.severityId,
-      productId: formValue.productId,
+      productIds: formValue.productIds,
       customFieldsJson: JSON.stringify(customFieldsObj)
     };
 
@@ -184,6 +291,16 @@ export class AddClaimComponent implements OnInit {
     this.selectedFiles = [];
     this.successMessage = '';
     this.errorMessage = '';
+    // Réinitialiser les FormArrays
+    while (this.customFields.length !== 0) {
+      this.customFields.removeAt(0);
+    }
+    while (this.productIds.length !== 0) {
+      this.productIds.removeAt(0);
+    }
+    // Réinitialiser les propriétés du dropdown
+    this.showProductDropdown = false;
+    this.productSearchTerm = '';
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
@@ -191,6 +308,13 @@ export class AddClaimComponent implements OnInit {
       control.markAsTouched();
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);
+      } else if (control instanceof FormArray) {
+        control.controls.forEach(arrayControl => {
+          if (arrayControl instanceof FormGroup) {
+            this.markFormGroupTouched(arrayControl);
+          }
+          arrayControl.markAsTouched();
+        });
       }
     });
   }

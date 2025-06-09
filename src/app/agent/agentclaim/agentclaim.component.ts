@@ -128,6 +128,10 @@ translateStatus(status: string): string {
       return status; // Affiche la valeur brute si aucune traduction trouvée
   }
 }
+getProducts(claim: any): any[] {
+  // Handle both possible structures: claim.products.$values or claim.products directly
+  return claim.products?.$values || claim.products || [];
+}
   getStatusLabel(status: string): string {
     const statusLabels: {[key: string]: string} = {
       'Pending': 'En attente',

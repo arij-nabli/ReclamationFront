@@ -59,7 +59,10 @@ export class ClientClaimsComponent implements OnInit {
       }
     });
   }
-
+getProducts(claim: any): any[] {
+  // Handle both possible structures: claim.products.$values or claim.products directly
+  return claim.products?.$values || claim.products || [];
+}
   get paginatedClaims(): Claim[] {
     const start = this.currentPage * this.pageSize;
     return this.filteredClaims.slice(start, start + this.pageSize);

@@ -38,8 +38,8 @@ export class UserListComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      role: ['', Validators.required],
-      password: ['']
+      role: ['', Validators.required]
+     
     });
 
     this.editUserForm = this.fb.group({
@@ -60,7 +60,7 @@ loadUsers(): void {
     next: (response: any) => {
       // Extraction du tableau des utilisateurs depuis la propriété $values
       this.users = response.$values || [];
-     
+     console.log(this.users)
     },
     error: (err) => {
       console.error('Error loading users:', err);
@@ -122,6 +122,7 @@ loadUsers(): void {
     if (this.addUserForm.invalid) return;
 
     const formValue = this.addUserForm.value;
+      formValue.username = formValue.username.replace(/\s+/g, '');
     this.userService.registerUser(formValue).subscribe({
       next: () => {
         this.showSuccess('Utilisateur créé avec succès');
@@ -138,7 +139,7 @@ loadUsers(): void {
   editUser(user: any): void {
     this.showEditForm = true;
     this.editUserForm.patchValue({
-      username: user.username,
+      username: user.userName,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
@@ -152,7 +153,7 @@ loadUsers(): void {
 
     const userId = this.userToDelete.id;
     const formValue = this.editUserForm.value;
-    
+      formValue.username = formValue.username.replace(/\s+/g, '');
     this.userService.modifyUser(userId, formValue).subscribe({
       next: () => {
         this.showSuccess('Utilisateur modifié avec succès');

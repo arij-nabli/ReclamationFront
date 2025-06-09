@@ -5,7 +5,11 @@ import { ClaimRoutingModule } from './claim-routing.module';
 import { AddClaimComponent } from './add-claim/add-claim.component';
 import { SideClientComponent } from './side-client/side-client.component';
 import { ClientClaimsComponent } from './client-claims/client-claims.component';
-
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 @NgModule({
   declarations: [
     AddClaimComponent,
@@ -15,7 +19,11 @@ import { ClientClaimsComponent } from './client-claims/client-claims.component';
   imports: [
     CommonModule,
     ReactiveFormsModule,  FormsModule,
-    ClaimRoutingModule
+    ClaimRoutingModule,  MatFormFieldModule,
+    MatSelectModule,
+    MatChipsModule,
+    MatIconModule,
+    MatInputModule, 
   ]
 })
 export class ClaimModule { }

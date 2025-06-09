@@ -63,6 +63,7 @@ export class ClosureValidationComponent implements OnInit {
     this.claimService.getClaimsByStatus(this.validatorId, 'TreatmentByTreatmentResponsible').subscribe({
       next: (response: any) => {
         this.claims = response.$values || [];
+        console.log(this.claims)
         this.filteredClaims = [...this.claims];
         this.calculateTotalPages();
         this.loading = false;
@@ -138,6 +139,10 @@ translateStatus(status: string): string {
     default:
       return status; // Affiche la valeur brute si aucune traduction trouvée
   }
+}
+getProducts(claim: any): any[] {
+  // Handle both possible structures: claim.products.$values or claim.products directly
+  return claim.products?.$values || claim.products || [];
 }
   validateClosure(isApproved: boolean): void {
     if (!this.selectedClaim) {

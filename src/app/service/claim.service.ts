@@ -15,29 +15,30 @@ export class ClaimService {
     return this.http.get<Claim[]>(`${this.apiUrl}/client/${clientId}`);
   }
 
-  submitClaim(clientId: string, claimData: any, files: File[]): Observable<any> {
-    const formData = new FormData();
-    
-    // Utiliser exactement 'claimJson' comme clé (comme dans Postman)
-    formData.append('claimJson', JSON.stringify({
-      nature: 'CUSTOMER_CLAIM', // ou claimData.nature si disponible
-      description: claimData.description,
-      status: 'Pending',
-      submissionDate: new Date().toISOString(),
-      customFieldsJson: claimData.customFieldsJson || '{}',
-      claimTypeFK: claimData.claimTypeId,
-      severityFK: claimData.severityId,
-      productFK: claimData.productId
-    }));
-    
-    // Ajouter les fichiers avec la clé 'files'
-    files.forEach(file => {
-      formData.append('files', file, file.name);
-    });
+submitClaim(clientId: string, claimData: any, files: File[] = []): Observable<any> {
+  const formData = new FormData();
+  
+  // Construction de l'objet claim pour le backend
+  const claimPayload = {
+    title: claimData.title,
+    description: claimData.description,
+    submissionDate: new Date().toISOString(),
+    customFieldsJson: claimData.customFieldsJson,
+    claimTypeFK: claimData.claimTypeId,
+    severityFK: claimData.severityId,
+      products: claimData.productIds?.map((id: string) => ({ id })) || []
+  
+  };
+console.log(claimPayload)
+  formData.append('claimJson', JSON.stringify(claimPayload));
+  
+  // Ajout des fichiers
+  files.forEach(file => {
+    formData.append('files', file, file.name);
+  });
 
-    const url = `${this.apiUrl}/submit?clientId=${clientId}`;
-    return this.http.post(url, formData);
-  }
+  return this.http.post(`${this.apiUrl}/submit?clientId=${clientId}`, formData);
+}
    // Nouvelles méthodes pour le workflow agent
    getPendingClaims(agentId: string): Observable<Claim[]> {
     return this.http.get<Claim[]>(`${this.apiUrl}/pending/${agentId}`);

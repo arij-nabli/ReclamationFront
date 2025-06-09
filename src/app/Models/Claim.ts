@@ -11,7 +11,7 @@ export class Claim {
   title: string;
   description: string;
   claimType: ClaimType;
-  product: Product;
+  product: Product[];
   customFieldsJson: string = '{}';
   submissionDate?: string;
   treatmentDescription?:string;
@@ -45,7 +45,7 @@ treatmentDate?:string;
     title: string,
     description: string,
     claimType: ClaimType,
-    product: Product,
+    product: Product[],
     severity: Severity,
     clientId: string,
     customFieldsJson: string = '{}',
@@ -73,7 +73,7 @@ treatmentDate?:string;
       json.title,
       json.description,
       json.claimType,
-      json.product,
+      json.product || json.products?.$values || [],
       json.severity,
       json.clientId,
       json.customFieldsJson || '{}',

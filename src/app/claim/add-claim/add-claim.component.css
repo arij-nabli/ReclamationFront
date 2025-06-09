@@ -11,7 +11,43 @@
       transform: rotate(360deg);
     }
   }
-  
+  /* Dans add-claim.component.css */
+.product-tag {
+  display: inline-flex;
+  align-items: center;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  margin-right: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.product-tag button {
+  margin-left: 0.25rem;
+  color: #0284c7;
+}
+
+.product-tag button:hover {
+  color: #0ea5e9;
+}
+
+.dropdown-container {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 10;
+  margin-top: 0.25rem;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: 0.375rem;
+  max-height: 15rem;
+  overflow-y: auto;
+}
   /* Style pour le modal */
   .fixed {
     position: fixed;

@@ -266,7 +266,10 @@ translateStatus(status: string): string {
       return status; // Affiche la valeur brute si aucune traduction trouvée
   }
 }
-  // Gardé pour la coloration spécifique du statut de la décision dans le tableau principal
+  getProducts(claim: any): any[] {
+  // Handle both possible structures: claim.products.$values or claim.products directly
+  return claim.products?.$values || claim.products || [];
+}
   getDecisionClass(status: string): string {
     switch (status) {
       case 'Pending': return 'bg-yellow-100 text-yellow-800';

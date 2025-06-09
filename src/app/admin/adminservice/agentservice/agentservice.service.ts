@@ -17,18 +17,28 @@ private baseApiUrl = `${environment.baseUrl}/admin`;
   getAgentsAndClients(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseApiUrl}/agents-and-clients`);
   }
-    registerUser(userData: any): Observable<any> {
-    return this.http.post(`${this.baseApiUrl}/create-user`, userData);
-  }
+   registerUser(userData: any): Observable<any> {
+  const token = localStorage.getItem('token'); 
+  const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  return this.http.post(`${this.baseApiUrl}/create-user`, userData, { headers });
+}
+
  // Modifier un utilisateur
-  modifyUser(userId: string, userData: any): Observable<any> {
-    return this.http.put(`${this.baseApiUrl}/modify-user/${userId}`, userData);
-  }
+modifyUser(userId: string, userData: any): Observable<any> {
+  const token = localStorage.getItem('token'); 
+  console.log(token)
+const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+return this.http.put(`${this.baseApiUrl}/modify-user/${userId}`, userData, { headers });
+
+}
 
   // Supprimer un utilisateur
-  deleteUser(userId: string): Observable<any> {
-    return this.http.delete(`${this.baseApiUrl}/delete-user/${userId}`);
-  }
+deleteUser(userId: string): Observable<any> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  return this.http.delete(`${this.baseApiUrl}/delete-user/${userId}`, { headers });
+}
+
   getUserById(userId: string): Observable<any> {
     return this.http.get<any>(`${this.baseApiUrl}/user/${userId}`);
   }
