@@ -1,9 +1,171 @@
-<div class="flex flex-col h-screen">
-    <app-navbar></app-navbar>
-    <div class="flex flex-1 overflow-hidden">
-      <app-sidebar></app-sidebar>
-      <main class="flex-1 overflow-auto p-6">
-        <!-- Contenu principal -->
-      </main>
+<div class="flex flex-col h-screen" style="background-color: #EBF3FE;">
+  <!-- Navbar en haut -->
+  <app-navbar></app-navbar>
+
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar à gauche -->
+    <app-sidebar></app-sidebar>
+
+    <!-- Contenu principal -->
+ <main class="flex-1 overflow-auto p-6">
+            <div class="p-4 sm:ml-64 flex flex-col h-full">
+      <div class="pb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Tableau de bord Administrateur</h1>
+      </div>
+
+      <!-- Grille de statistiques -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Carte Utilisateurs -->
+        <div class="bg-white rounded-2xl shadow-md p-6">
+          <div class="flex items-center">
+            <div class="p-3 rounded-lg bg-blue-100">
+              <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+           <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-500">Agents</h3>
+                <p class="text-2xl font-bold text-gray-800">{{ agentCount }}</p>
+                <p *ngIf="agentLoading" class="text-sm text-gray-500">Chargement...</p>
+                <p *ngIf="agentError" class="text-sm text-red-500">Erreur de chargement</p>
+              </div>
+          
+          </div>
+        </div>
+<div class="bg-white rounded-2xl shadow-md p-6">
+  <div class="flex items-center">
+    <div class="p-3 rounded-lg bg-green-100">
+      <svg class="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+    </div>
+    <div class="ml-4">
+      <h3 class="text-lg font-medium text-gray-500">Clients</h3>
+      <p class="text-2xl font-bold text-gray-800">{{ clientCount }}</p>
+      <p *ngIf="clientLoading" class="text-sm text-gray-500">Chargement...</p>
+      <p *ngIf="clientError" class="text-sm text-red-500">Erreur de chargement</p>
     </div>
   </div>
+</div>
+        <!-- Carte Commandes -->
+        <div class="bg-white rounded-2xl shadow-md p-6">
+          <div class="flex items-center">
+            <div class="p-3 rounded-lg bg-green-100">
+              <svg class="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-lg font-medium text-gray-500">Commandes</h3>
+              <p class="text-2xl font-bold text-gray-800">1,245</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Carte Revenus -->
+        <div class="bg-white rounded-2xl shadow-md p-6">
+          <div class="flex items-center">
+            <div class="p-3 rounded-lg bg-purple-100">
+              <svg class="h-6 w-6 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-lg font-medium text-gray-500">Revenus</h3>
+              <p class="text-2xl font-bold text-gray-800">$34,245</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Carte Problèmes -->
+        <div class="bg-white rounded-2xl shadow-md p-6">
+          <div class="flex items-center">
+            <div class="p-3 rounded-lg bg-red-100">
+              <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-lg font-medium text-gray-500">Problèmes</h3>
+              <p class="text-2xl font-bold text-gray-800">24</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphiques -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Graphique Activité -->
+        <div class="bg-white rounded-2xl shadow-md p-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">Activité des utilisateurs</h2>
+          <div class="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
+            <p class="text-gray-400">Graphique d'activité</p>
+          </div>
+        </div>
+
+        <!-- Graphique Revenus -->
+        <div class="bg-white rounded-2xl shadow-md p-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">Revenus mensuels</h2>
+          <div class="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
+            <p class="text-gray-400">Graphique de revenus</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dernières activités -->
+      <div class="bg-white rounded-2xl shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Activité récente</h2>
+        <div class="space-y-4">
+          <!-- Activité 1 -->
+          <div class="flex items-start pb-4 border-b border-gray-100">
+            <div class="flex-shrink-0 p-2 bg-blue-50 rounded-full">
+              <svg class="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3 flex-1">
+              <p class="text-sm font-medium text-gray-900">Nouvel utilisateur inscrit</p>
+              <p class="text-sm text-gray-500">Jean Dupont s'est inscrit il y a 2 heures</p>
+            </div>
+            <div class="text-sm text-gray-500">10:45 AM</div>
+          </div>
+
+          <!-- Activité 2 -->
+          <div class="flex items-start pb-4 border-b border-gray-100">
+            <div class="flex-shrink-0 p-2 bg-green-50 rounded-full">
+              <svg class="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3 flex-1">
+              <p class="text-sm font-medium text-gray-900">Nouvelle commande</p>
+              <p class="text-sm text-gray-500">Commande #1234 pour $245.00</p>
+            </div>
+            <div class="text-sm text-gray-500">09:32 AM</div>
+          </div>
+
+          <!-- Activité 3 -->
+          <div class="flex items-start">
+            <div class="flex-shrink-0 p-2 bg-red-50 rounded-full">
+              <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3 flex-1">
+              <p class="text-sm font-medium text-gray-900">Problème signalé</p>
+              <p class="text-sm text-gray-500">Un utilisateur a signalé un problème de paiement</p>
+            </div>
+            <div class="text-sm text-gray-500">Hier, 14:30</div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Notifications en bas (optionnel) -->
+  <div class="fixed bottom-0 left-0 right-0 z-50 space-y-2 p-2">
+    <!-- Contenu des notifications ici -->
+  </div>
+</div>

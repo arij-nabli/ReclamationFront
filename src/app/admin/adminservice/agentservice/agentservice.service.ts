@@ -32,6 +32,16 @@ return this.http.put(`${this.baseApiUrl}/modify-user/${userId}`, userData, { hea
 
 }
 
+  getAgents(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}`);
+  }
+
+  // Récupérer les clients
+  getClients(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseApiUrl}/users-by-role/Client`);
+  }
+
+
   // Supprimer un utilisateur
 deleteUser(userId: string): Observable<any> {
   const token = localStorage.getItem('token');
@@ -42,7 +52,5 @@ deleteUser(userId: string): Observable<any> {
   getUserById(userId: string): Observable<any> {
     return this.http.get<any>(`${this.baseApiUrl}/user/${userId}`);
   }
-  getAgents(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
-  }
+
 }

@@ -31,10 +31,12 @@ import { ProductListComponent } from './product-list/product-list.component';
 import { MatSnackBarModule  } from '@angular/material/snack-bar';
 import { UserListComponent } from './user-list/user-list.component';
 
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
   declarations: [
       DashboardComponent,
+    
     SidebarComponent,
     NavbarComponent,
     ClaimetypeComponent,
@@ -45,11 +47,13 @@ import { UserListComponent } from './user-list/user-list.component';
     ValidateursClotureComponent,
     SeverityListComponent,
     ProductListComponent,
-    UserListComponent
+    UserListComponent,
+    
   ],
   imports: [
     CommonModule,
     FormsModule,
+      MatMenuModule,
     ReactiveFormsModule,
     AdminRoutingModule, HttpClientModule,MatToolbarModule,MatSnackBarModule ,
     MatSidenavModule,

@@ -1,0 +1,39 @@
+/* Custom styles for the dashboard component */
+.mat-mdc-form-field {
+  font-size: 14px;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-flex {
+  background-color: white;
+}
+
+.mat-toolbar {
+  background-color: white !important;
+  color: #374151 !important;
+}
+
+.mat-mdc-card {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+  border-radius: 8px !important;
+}
+
+/* Custom chart styles */
+.chart-bar {
+  transition: all 0.3s ease;
+}
+
+.chart-bar:hover {
+  opacity: 0.8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .col-span-2 {
+    grid-column: span 1;
+  }
+}
+
